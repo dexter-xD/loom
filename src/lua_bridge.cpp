@@ -1,7 +1,7 @@
 #include "lua_bridge.h"
 #include "syntax_highlighter.h"
 #include "plugin_manager.h"
-#include <QDebug>
+#include "debug_log.h"
 #include <QDir>
 #include <QStandardPaths>
 #include <QCoreApplication>
@@ -50,7 +50,7 @@ bool LuaBridge::initialize()
 
     registerEditorAPI();
 
-    qDebug() << "Lua bridge initialized successfully";
+    DEBUG_LOG_LUA("Lua bridge initialized successfully");
     return true;
 }
 
@@ -62,7 +62,7 @@ bool LuaBridge::loadConfig(const QString &configPath)
     }
 
     if (!QFile::exists(configPath)) {
-        qDebug() << "Config file not found:" << configPath;
+        DEBUG_LOG_LUA("Config file not found:" << configPath);
         return true; 
     }
 
@@ -81,16 +81,16 @@ bool LuaBridge::loadConfig(const QString &configPath)
     lua_pop(m_lua, 1);
 
     if (!hasConfig) {
-        qWarning() << "Config table not found in configuration file";
+        DEBUG_LOG_LUA("Config table not found in configuration file");
     }
 
     if (!hasGetConfig) {
-        qWarning() << "get_config function not found in configuration file";
+        DEBUG_LOG_LUA("get_config function not found in configuration file");
     }
 
-    qDebug() << "Config loaded successfully from:" << configPath;
-    qDebug() << "Config table available:" << hasConfig;
-    qDebug() << "get_config function available:" << hasGetConfig;
+    DEBUG_LOG_LUA("Config loaded successfully from:" << configPath);
+    DEBUG_LOG_LUA("Config table available:" << hasConfig);
+    DEBUG_LOG_LUA("get_config function available:" << hasGetConfig);
     return true;
 }
 
@@ -135,6 +135,8 @@ void LuaBridge::registerEditorAPI()
 
     registerFunction("create_timer", lua_createTimer);
     registerFunction("stop_timer", lua_stopTimer);
+    
+    registerFunction("debug_log", lua_debugLog);
 
     lua_newtable(m_lua);
     lua_pushcfunction(m_lua, lua_registerEventHandler);
@@ -198,7 +200,7 @@ void LuaBridge::emitEvent(const QString &eventName, const QVariantList &args)
                     .arg(handlerFunction)
                     .arg(eventName)
                     .arg(lua_tostring(m_lua, -1));
-                qWarning() << error;
+                DEBUG_LOG_LUA(error);
                 lua_pop(m_lua, 1); 
             }
         } else {
@@ -265,7 +267,7 @@ void LuaBridge::handleLuaError(const QString &context)
 
     lua_pop(m_lua, 1);
 
-    qDebug() << "Lua error -" << m_lastError;
+    LOG_ERROR("Lua error -" << m_lastError);
 }
 
 int LuaBridge::lua_openFile(lua_State *L)
@@ -297,13 +299,13 @@ int LuaBridge::lua_saveFile(lua_State *L)
 int LuaBridge::lua_getText(lua_State *L)
 {
     if (!g_bridge) {
-        qWarning() << "lua_getText: g_bridge is null";
+        DEBUG_LOG_LUA("lua_getText: g_bridge is null");
         lua_pushstring(L, "");
         return 1;
     }
 
     QString text = g_bridge->getEditorText();
-    qDebug() << "lua_getText called, returning text length:" << text.length();
+    DEBUG_LOG_LUA("lua_getText called, returning text length:" << text.length());
     lua_pushstring(L, text.toUtf8().constData());
     return 1;
 }
@@ -311,13 +313,13 @@ int LuaBridge::lua_getText(lua_State *L)
 int LuaBridge::lua_setText(lua_State *L)
 {
     if (!g_bridge) {
-        qWarning() << "lua_setText: g_bridge is null";
+        DEBUG_LOG_LUA("lua_setText: g_bridge is null");
         return 0;
     }
 
     const char *text = luaL_checkstring(L, 1);
     QString textStr = QString::fromUtf8(text);
-    qDebug() << "lua_setText called with text:" << textStr;
+    DEBUG_LOG_LUA("lua_setText called with text:" << textStr);
     g_bridge->setEditorText(textStr);
     return 0;
 }
@@ -541,7 +543,7 @@ QMap<QString, QString> LuaBridge::getKeybindings()
     lua_getglobal(m_lua, "config");
     if (!lua_istable(m_lua, -1)) {
         lua_pop(m_lua, 1);
-        qWarning() << "Config table not found for keybindings";
+        DEBUG_LOG_LUA("Config table not found for keybindings");
         return keybindings;
     }
 
@@ -550,7 +552,7 @@ QMap<QString, QString> LuaBridge::getKeybindings()
 
     if (!lua_istable(m_lua, -1)) {
         lua_pop(m_lua, 2); 
-        qWarning() << "Keybindings table not found in configuration";
+        DEBUG_LOG_LUA("Keybindings table not found in configuration");
         return keybindings;
     }
 
@@ -574,7 +576,7 @@ QMap<QString, QString> LuaBridge::getKeybindings()
 
 void LuaBridge::setEditorText(const QString &text)
 {
-    qDebug() << "LuaBridge::setEditorText emitting signal with text:" << text;
+    DEBUG_LOG_LUA("LuaBridge::setEditorText emitting signal with text:" << text);
     emit textChangeRequested(text);
 }
 
@@ -617,7 +619,7 @@ bool LuaBridge::executeFile(const QString &filePath)
         return false;
     }
 
-    qDebug() << "Lua file executed successfully:" << filePath;
+    DEBUG_LOG_LUA("Lua file executed successfully:" << filePath);
     return true;
 }
 
@@ -636,7 +638,7 @@ void LuaBridge::setPluginManager(PluginManager *pluginManager)
 void LuaBridge::loadSyntaxRulesForLanguage(const QString &language)
 {
     if (!m_syntaxHighlighter) {
-        qWarning() << "No syntax highlighter set, cannot load rules for language:" << language;
+        DEBUG_LOG_LUA("No syntax highlighter set, cannot load rules for language:" << language);
         return;
     }
 
@@ -746,11 +748,11 @@ int LuaBridge::lua_createTimer(lua_State *L)
             if (lua_isfunction(g_bridge->m_lua, -1)) {
                 if (lua_pcall(g_bridge->m_lua, 0, 0, 0) != 0) {
                     QString error = QString("Timer callback error: %1").arg(lua_tostring(g_bridge->m_lua, -1));
-                    qWarning() << error;
+                    DEBUG_LOG_LUA(error);
                     lua_pop(g_bridge->m_lua, 1); 
                 }
             } else {
-                qWarning() << "Timer callback" << callbackFunction << "is not a function";
+                DEBUG_LOG_LUA("Timer callback" << callbackFunction << "is not a function");
                 lua_pop(g_bridge->m_lua, 1); 
             }
         }
@@ -793,7 +795,7 @@ int LuaBridge::lua_stopTimer(lua_State *L)
 
         lua_pushboolean(L, true);
     } else {
-        qWarning() << "Timer" << timerId << "not found";
+        DEBUG_LOG_LUA("Timer" << timerId << "not found");
         lua_pushboolean(L, false);
     }
 
@@ -891,4 +893,24 @@ int LuaBridge::lua_getPluginConfig(lua_State *L)
     }
 
     return 1;
+}
+
+int LuaBridge::lua_debugLog(lua_State *L)
+{
+    if (lua_gettop(L) != 1) {
+        return 0;
+    }
+
+    const char *message = luaL_checkstring(L, 1);
+    if (message) {
+#ifdef NDEBUG
+        // Release build - no debug logs from Lua
+        (void)message; // Suppress unused variable warning
+#else
+        // Debug build - show Lua debug logs
+        DEBUG_LOG_LUA(message);
+#endif
+    }
+
+    return 0;
 }

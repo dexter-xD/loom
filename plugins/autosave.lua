@@ -1,9 +1,19 @@
 -- autosave plugin
 -- automatically saves files every 30 seconds
 
+local function debug_print(msg)
+    if editor and editor.debug_log then
+        editor.debug_log(msg)
+    end
+end
+
+local function info_print(msg)
+    print(msg)
+end
+
 autosave = {
     name = "autosave",
-    version = "1.0",
+    version = "1.1",
     description = "Automatically saves files every 30 seconds",
     
     -- plugin state
@@ -16,7 +26,7 @@ autosave = {
 
 -- initialize plugin
 function autosave.initialize()
-    print("Initializing autosave plugin...")
+    debug_print("Initializing autosave plugin...")
     
     -- check if autosave is enabled in configuration
     if config and config.plugins and config.plugins.autosave then
@@ -25,7 +35,7 @@ function autosave.initialize()
     end
     
     if not autosave.enabled then
-        print("Autosave plugin is disabled in configuration")
+        debug_print("Autosave plugin is disabled in configuration")
         return
     end
     
@@ -33,11 +43,11 @@ function autosave.initialize()
     autosave.timer_id = timer.create(autosave.interval, "autosave_timer_callback", true)
     
     if autosave.timer_id then
-        print(string.format("Autosave timer created with ID %d, interval: %d seconds", 
+        debug_print(string.format("Autosave timer created with ID %d, interval: %d seconds", 
               autosave.timer_id, autosave.interval / 1000))
         editor.set_status_text(string.format("Autosave enabled (%ds interval)", autosave.interval / 1000))
     else
-        print("Failed to create autosave timer")
+        debug_print("Failed to create autosave timer")
     end
     
     -- register for file events to track when files are opened/saved manually
@@ -48,12 +58,12 @@ end
 
 -- cleanup plugin
 function autosave.cleanup()
-    print("Cleaning up autosave plugin...")
+    debug_print("Cleaning up autosave plugin...")
     
     if autosave.timer_id then
         timer.stop(autosave.timer_id)
         autosave.timer_id = nil
-        print("Autosave timer stopped")
+        debug_print("Autosave timer stopped")
     end
     
     -- cleanup global callback function
@@ -82,7 +92,7 @@ function autosave.on_timer()
         autosave.save_count = autosave.save_count + 1
         autosave.last_save_time = os.time()
         
-        print(string.format("Autosave: File saved automatically (count: %d)", autosave.save_count))
+        debug_print(string.format("Autosave: File saved automatically (count: %d)", autosave.save_count))
         editor.set_status_text(string.format("Autosaved at %s (count: %d)", 
                                os.date("%H:%M:%S"), autosave.save_count))
         
@@ -91,7 +101,7 @@ function autosave.on_timer()
             _G["autoformat.on_autosave_end"]()
         end
     else
-        print("Autosave: No content to save")
+        debug_print("Autosave: No content to save")
     end
 end
 
@@ -100,13 +110,13 @@ _G["autosave_timer_callback"] = autosave.on_timer
 
 -- event handlers
 function autosave.on_file_opened(event_name, file_path)
-    print(string.format("Autosave: File opened - %s", file_path or "unknown"))
+    debug_print(string.format("Autosave: File opened - %s", file_path or "unknown"))
     -- reset save count for new file
     autosave.save_count = 0
 end
 
 function autosave.on_file_saved(event_name, file_path)
-    print(string.format("Autosave: File saved manually - %s", file_path or "unknown"))
+    debug_print(string.format("Autosave: File saved manually - %s", file_path or "unknown"))
     -- update last save time when user saves manually
     autosave.last_save_time = os.time()
 end
@@ -143,16 +153,16 @@ function autosave.toggle()
         if not autosave.timer_id then
             autosave.timer_id = timer.create(autosave.interval, "autosave_timer_callback", true)
         end
-        print("Autosave enabled")
+        info_print("Autosave enabled")
         editor.set_status_text("Autosave enabled")
     else
         if autosave.timer_id then
             timer.stop(autosave.timer_id)
             autosave.timer_id = nil
         end
-        print("Autosave disabled")
+        info_print("Autosave disabled")
         editor.set_status_text("Autosave disabled")
     end
 end
 
-print("Autosave plugin loaded successfully!")
+debug_print("Autosave plugin loaded successfully!")

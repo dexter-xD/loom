@@ -4,7 +4,7 @@
 
 #include "syntax_highlighter.h"
 #include "syntax_rules.h"
-#include <QDebug>
+#include "debug_log.h"
 
 SyntaxHighlighter::SyntaxHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
@@ -17,12 +17,12 @@ SyntaxHighlighter::SyntaxHighlighter(QTextDocument *parent)
 void SyntaxHighlighter::setLanguage(const QString &language)
 {
     if (m_currentLanguage != language) {
-        qDebug() << "SyntaxHighlighter: Changing language from" << m_currentLanguage << "to" << language;
+        DEBUG_LOG_SYNTAX("SyntaxHighlighter: Changing language from" << m_currentLanguage << "to" << language);
         m_currentLanguage = language;
         clearRules();
 
         initializeDefaultRules();
-        qDebug() << "SyntaxHighlighter: Language changed, rules loaded:" << m_rules.size();
+        DEBUG_LOG_SYNTAX("SyntaxHighlighter: Language changed, rules loaded:" << m_rules.size());
     }
 }
 
@@ -46,18 +46,18 @@ void SyntaxHighlighter::addRule(const QString &pattern, const QString &colorName
 {
     QRegularExpression regex(pattern);
     if (!regex.isValid()) {
-        qWarning() << "Invalid regex pattern:" << pattern << "Error:" << regex.errorString();
+        DEBUG_LOG_SYNTAX("Invalid regex pattern:" << pattern << "Error:" << regex.errorString());
         return;
     }
 
     QTextCharFormat format = getFormat(colorName);
     if (format == QTextCharFormat()) {
-        qWarning() << "Unknown color name:" << colorName;
+        DEBUG_LOG_SYNTAX("Unknown color name:" << colorName);
         return;
     }
 
     m_rules.append(HighlightRule(regex, format, colorName, pattern));
-    qDebug() << "Added highlighting rule:" << pattern << "with color:" << colorName;
+    DEBUG_LOG_SYNTAX("Added highlighting rule:" << pattern << "with color:" << colorName);
 }
 
 void SyntaxHighlighter::setupGruvboxColors()
@@ -93,7 +93,7 @@ void SyntaxHighlighter::highlightBlock(const QString &text)
 
                 static int formatCount = 0;
                 if (formatCount < 5) {
-                    qDebug() << "Applied format for" << rule.colorName << "to:" << text.mid(startIndex, length) << "with color:" << rule.format.foreground().color().name();
+                    DEBUG_LOG_SYNTAX("Applied format for" << rule.colorName << "to:" << text.mid(startIndex, length) << "with color:" << rule.format.foreground().color().name());
                     formatCount++;
                 }
             }
@@ -330,7 +330,7 @@ void SyntaxHighlighter::initializeDefaultRules()
 
     SyntaxRules::applyRules(this, m_currentLanguage);
 
-    qDebug() << "Initialized" << m_rules.size() << "default highlighting rules for language:" << m_currentLanguage;
+    DEBUG_LOG_SYNTAX("Initialized" << m_rules.size() << "default highlighting rules for language:" << m_currentLanguage);
 }
 
 void SyntaxHighlighter::setupDefaultColors()
@@ -417,7 +417,7 @@ void SyntaxHighlighter::setupDefaultColors()
     escapeFormat.setFontWeight(QFont::Bold);
     m_colorFormats["escape"] = escapeFormat;
 
-    qDebug() << "Gruvbox color scheme initialized with" << m_colorFormats.size() << "color formats";
+    DEBUG_LOG_SYNTAX("Gruvbox color scheme initialized with" << m_colorFormats.size() << "color formats");
 }
 
 QColor SyntaxHighlighter::gruvboxColor(const QString &colorName) const

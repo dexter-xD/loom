@@ -1,9 +1,19 @@
 -- Auto-formatter plugin
 -- Uses external formatters only (clang-format, prettier, stylua, etc.)
 
+local function debug_print(msg)
+    if editor and editor.debug_log then
+        editor.debug_log(msg)
+    end
+end
+
+local function info_print(msg)
+    print(msg)
+end
+
 autoformat = {
     name = "autoformat",
-    version = "3.0",
+    version = "3.1",
     description = "Formats code using external formatters only",
     
     -- plugin state
@@ -64,7 +74,7 @@ autoformat = {
 
 -- initialize plugin
 function autoformat.initialize()
-    print("Initializing auto-formatter plugin...")
+    debug_print("Initializing auto-formatter plugin...")
     
     -- check configuration
     if config and config.plugins and config.plugins.autoformat then
@@ -74,7 +84,7 @@ function autoformat.initialize()
     end
     
     if not autoformat.enabled then
-        print("Auto-formatter plugin is disabled")
+        debug_print("Auto-formatter plugin is disabled")
         return
     end
     
@@ -84,15 +94,15 @@ function autoformat.initialize()
     -- register for events
     if autoformat.format_on_save then
         events.connect("file_saved", "autoformat.on_file_saved")
-        print("Auto-format: Format on save enabled")
+        debug_print("Auto-format: Format on save enabled")
     end
     
-    print("Auto-formatter plugin initialized successfully")
+    debug_print("Auto-formatter plugin initialized successfully")
 end
 
 -- check which external formatters are available
 function autoformat.check_available_formatters()
-    print("Auto-format: Checking available external formatters...")
+    debug_print("Auto-format: Checking available external formatters...")
     
     for language, formatter_config in pairs(autoformat.formatters) do
         if formatter_config.external then
@@ -100,9 +110,9 @@ function autoformat.check_available_formatters()
             formatter_config.available = available
             
             if available then
-                print(string.format("  ✓ %s: %s", language, formatter_config.external))
+                debug_print(string.format("  ✓ %s: %s", language, formatter_config.external))
             else
-                print(string.format("  ✗ %s: %s (not found)", language, formatter_config.external))
+                debug_print(string.format("  ✗ %s: %s (not found)", language, formatter_config.external))
             end
         end
     end
@@ -121,14 +131,14 @@ end
 
 -- cleanup plugin
 function autoformat.cleanup()
-    print("Cleaning up auto-formatter plugin...")
+    debug_print("Cleaning up auto-formatter plugin...")
 end
 
 -- format current document
 function autoformat.format_document()
     local text = editor.get_text()
     if not text or string.len(text) == 0 then
-        print("Auto-format: No content to format")
+        debug_print("Auto-format: No content to format")
         return
     end
     
@@ -138,7 +148,7 @@ function autoformat.format_document()
     -- Try to detect language from file content
     local language = autoformat.detect_language(text)
     if not autoformat.formatters[language] then
-        print(string.format("Auto-format: Language '%s' not supported", language or "unknown"))
+        debug_print(string.format("Auto-format: Language '%s' not supported", language or "unknown"))
         return
     end
     
@@ -152,12 +162,12 @@ function autoformat.format_document()
         -- Mark that we just formatted to prevent double formatting
         autoformat.just_formatted = true
         
-        print(string.format("Auto-format: Document formatted (%s)", language))
+        debug_print(string.format("Auto-format: Document formatted (%s)", language))
         editor.set_status_text(string.format("Formatted with %s", 
                               autoformat.formatters[language].external))
         return true
     else
-        print("Auto-format: No changes needed or formatting failed")
+        debug_print("Auto-format: No changes needed or formatting failed")
         return false
     end
 end
@@ -166,7 +176,7 @@ end
 function autoformat.format_text(text, language)
     local formatter_config = autoformat.formatters[language]
     if not formatter_config then
-        print(string.format("Auto-format: Language '%s' not supported", language))
+        debug_print(string.format("Auto-format: Language '%s' not supported", language))
         return text
     end
     
@@ -176,11 +186,11 @@ function autoformat.format_text(text, language)
         if formatted then
             return formatted
         else
-            print(string.format("Auto-format: %s failed", formatter_config.external))
+            debug_print(string.format("Auto-format: %s failed", formatter_config.external))
         end
     else
         if not formatter_config.available then
-            print(string.format("Auto-format: %s not available for %s", formatter_config.external, language))
+            debug_print(string.format("Auto-format: %s not available for %s", formatter_config.external, language))
         end
     end
     
@@ -196,7 +206,7 @@ function autoformat.format_with_external(text, language, formatter_config)
     local temp_file = "/tmp/autoformat_input_" .. os.time()
     local file = io.open(temp_file, "w")
     if not file then
-        print("Auto-format: Failed to create temporary file")
+        debug_print("Auto-format: Failed to create temporary file")
         return nil
     end
     
@@ -225,7 +235,6 @@ function autoformat.format_with_external(text, language, formatter_config)
     end
     
     local full_command = table.concat(cmd_parts, " ")
-    -- print(string.format("Auto-format: Running %s", full_command))
     
     -- Execute formatter
     local handle = io.popen(full_command .. " 2>/dev/null")
@@ -338,19 +347,19 @@ end
 function autoformat.on_file_saved(event_name, file_path)
     -- Don't format if autosave is in progress
     if autoformat.is_autosave_in_progress then
-        print("Auto-format: Skipping format (autosave in progress)")
+        debug_print("Auto-format: Skipping format (autosave in progress)")
         return
     end
     
     -- Don't format if we just formatted before saving (prevent double formatting)
     if autoformat.just_formatted then
-        print("Auto-format: Skipping format (already formatted before save)")
+        debug_print("Auto-format: Skipping format (already formatted before save)")
         autoformat.just_formatted = false
         return
     end
     
     if autoformat.format_on_save and autoformat.enabled then
-        print("Auto-format: Formatting on manual save...")
+        debug_print("Auto-format: Formatting on manual save...")
         autoformat.format_document()
     end
 end
@@ -373,13 +382,13 @@ _G["autoformat.on_autosave_end"] = autoformat.on_autosave_end
 -- utility functions
 function autoformat.toggle()
     autoformat.enabled = not autoformat.enabled
-    print(string.format("Auto-formatter %s", autoformat.enabled and "enabled" or "disabled"))
+    info_print(string.format("Auto-formatter %s", autoformat.enabled and "enabled" or "disabled"))
     editor.set_status_text(string.format("Auto-formatter %s", autoformat.enabled and "enabled" or "disabled"))
 end
 
 function autoformat.toggle_format_on_save()
     autoformat.format_on_save = not autoformat.format_on_save
-    print(string.format("Format on save %s", autoformat.format_on_save and "enabled" or "disabled"))
+    info_print(string.format("Format on save %s", autoformat.format_on_save and "enabled" or "disabled"))
     editor.set_status_text(string.format("Format on save %s", autoformat.format_on_save and "enabled" or "disabled"))
     
     -- Update event connection
@@ -391,19 +400,19 @@ function autoformat.toggle_format_on_save()
 end
 
 function autoformat.show_status()
-    print("=== Auto-formatter Status ===")
-    print(string.format("Enabled: %s", autoformat.enabled and "Yes" or "No"))
-    print(string.format("Format on save: %s", autoformat.format_on_save and "Yes" or "No"))
-    print(string.format("External formatters: %s", autoformat.use_external_formatters and "Yes" or "No"))
+    info_print("=== Auto-formatter Status ===")
+    info_print(string.format("Enabled: %s", autoformat.enabled and "Yes" or "No"))
+    info_print(string.format("Format on save: %s", autoformat.format_on_save and "Yes" or "No"))
+    info_print(string.format("External formatters: %s", autoformat.use_external_formatters and "Yes" or "No"))
     
-    print("\nAvailable formatters:")
+    info_print("\nAvailable formatters:")
     for language, config in pairs(autoformat.formatters) do
         if config.external then
             local status = config.available and "✓" or "✗"
-            print(string.format("  %s %s: %s", status, language, config.external))
+            info_print(string.format("  %s %s: %s", status, language, config.external))
         end
     end
-    print("=============================")
+    info_print("=============================")
 end
 
-print("Auto-formatter plugin loaded successfully!")
+debug_print("Auto-formatter plugin loaded successfully!")

@@ -110,6 +110,8 @@ private:
 
     static int lua_createTimer(lua_State *L);
     static int lua_stopTimer(lua_State *L);
+    
+    static int lua_debugLog(lua_State *L);
 
     static int lua_listPlugins(lua_State *L);
     static int lua_isPluginLoaded(lua_State *L);

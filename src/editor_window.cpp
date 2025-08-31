@@ -7,7 +7,7 @@
 #include <QTextStream>
 #include <QFileInfo>
 #include <QFont>
-#include <QDebug>
+#include "debug_log.h"
 #include <QDir>
 #include <QStandardPaths>
 #include <QTimer>
@@ -28,7 +28,7 @@ EditorWindow::EditorWindow(QWidget *parent)
 
     m_luaBridge = new LuaBridge(this);
     if (!m_luaBridge->initialize()) {
-        qWarning() << "Failed to initialize Lua bridge:" << m_luaBridge->lastError();
+        LOG_ERROR("Failed to initialize Lua bridge:" << m_luaBridge->lastError());
     }
 
     m_pluginManager = new PluginManager(m_luaBridge, this);
@@ -296,11 +296,11 @@ void EditorWindow::setupMenus()
 
             m_statusBar->showMessage(message, 5000);
 
-            qDebug() << "=== PLUGIN STATUS ===";
-            qDebug() << "Available plugins:" << availablePlugins;
-            qDebug() << "Loaded plugins:" << loadedPlugins;
+            DEBUG_LOG_EDITOR("=== PLUGIN STATUS ===");
+            DEBUG_LOG_EDITOR("Available plugins:" << availablePlugins);
+            DEBUG_LOG_EDITOR("Loaded plugins:" << loadedPlugins);
             if (!errors.isEmpty()) {
-                qDebug() << "Plugin errors:" << errors;
+                DEBUG_LOG_EDITOR("Plugin errors:" << errors);
             }
         }
     });
@@ -360,9 +360,9 @@ void EditorWindow::openFile(const QString &filePath)
         tabIndex = createNewTab();
     }
     Buffer* buffer = m_buffers[tabIndex];
-    qDebug() << "Created tab" << tabIndex << "buffer content before load:" << buffer->content().length();
+    DEBUG_LOG_EDITOR("Created tab" << tabIndex << "buffer content before load:" << buffer->content().length());
 
-    qDebug() << "About to call buffer->load() for:" << filePath;
+    DEBUG_LOG_EDITOR("About to call buffer->load() for:" << filePath);
     if (buffer->load(filePath)) {
 
         m_tabWidget->setCurrentIndex(tabIndex);
@@ -665,7 +665,7 @@ void EditorWindow::updateWindowTitle()
 void EditorWindow::loadConfiguration()
 {
     if (!m_luaBridge) {
-        qWarning() << "loadConfiguration: luaBridge is null";
+        LOG_ERROR("loadConfiguration: luaBridge is null");
         return;
     }
 
@@ -678,14 +678,14 @@ void EditorWindow::loadConfiguration()
     }
 
     if (QFile::exists(configPath)) {
-        qDebug() << "Loading configuration from:" << configPath;
+        DEBUG_LOG_EDITOR("Loading configuration from:" << configPath);
         if (m_luaBridge->loadConfig(configPath)) {
-            qDebug() << "Configuration loaded successfully from:" << configPath;
+            DEBUG_LOG_EDITOR("Configuration loaded successfully from:" << configPath);
         } else {
-            qWarning() << "Failed to load configuration:" << m_luaBridge->lastError();
+            LOG_ERROR("Failed to load configuration:" << m_luaBridge->lastError());
         }
     } else {
-        qWarning() << "No configuration file found at any location, using defaults";
+        DEBUG_LOG_EDITOR("No configuration file found at any location, using defaults");
     }
 
 }
@@ -693,7 +693,7 @@ void EditorWindow::loadConfiguration()
 void EditorWindow::loadPlugins()
 {
     if (!m_pluginManager) {
-        qWarning() << "loadPlugins: pluginManager is null";
+        LOG_ERROR("loadPlugins: pluginManager is null");
         return;
     }
 
@@ -706,19 +706,19 @@ void EditorWindow::loadPlugins()
     }
 
     if (QDir(pluginDir).exists()) {
-        qDebug() << "Loading plugins from directory:" << pluginDir;
+        DEBUG_LOG_EDITOR("Loading plugins from directory:" << pluginDir);
         if (m_pluginManager->loadPlugins(pluginDir)) {
             QStringList loadedPlugins = m_pluginManager->loadedPlugins();
-            qDebug() << "Plugins loaded successfully:" << loadedPlugins;
+            LOG_INFO("Plugins loaded successfully:" << loadedPlugins);
 
             if (!loadedPlugins.isEmpty()) {
                 m_statusBar->showMessage(QString("Loaded %1 plugin(s)").arg(loadedPlugins.size()), 3000);
             }
         } else {
-            qWarning() << "Failed to load plugins:" << m_pluginManager->lastError();
+            LOG_ERROR("Failed to load plugins:" << m_pluginManager->lastError());
         }
     } else {
-        qDebug() << "No plugin directory found, continuing without plugins";
+        DEBUG_LOG_EDITOR("No plugin directory found, continuing without plugins");
     }
 
 }
@@ -726,7 +726,7 @@ void EditorWindow::loadPlugins()
 void EditorWindow::applyConfiguration()
 {
     if (!m_luaBridge) {
-        qWarning() << "applyConfiguration: missing luaBridge";
+        LOG_ERROR("applyConfiguration: missing luaBridge");
         return;
     }
 
@@ -808,12 +808,12 @@ void EditorWindow::onLuaFileSaveRequested(const QString &filePath)
 
 void EditorWindow::onLuaTextChangeRequested(const QString &content)
 {
-    qDebug() << "EditorWindow::onLuaTextChangeRequested called with content:" << content;
+    DEBUG_LOG_EDITOR("EditorWindow::onLuaTextChangeRequested called with content:" << content);
 
     CodeEditor* textEdit = getCurrentTextEditor();
     Buffer* buffer = getCurrentBuffer();
     if (!textEdit || !buffer) {
-        qWarning() << "No current text editor or buffer available";
+        DEBUG_LOG_EDITOR("No current text editor or buffer available");
         return;
     }
 
@@ -834,15 +834,15 @@ void EditorWindow::onLuaTextChangeRequested(const QString &content)
 
     textEdit->update();
     QString actualText = textEdit->toPlainText();
-    qDebug() << "Text actually set in editor. Length:" << actualText.length();
-    qDebug() << "Text matches requested:" << (actualText == content);
+    DEBUG_LOG_EDITOR("Text actually set in editor. Length:" << actualText.length());
+    DEBUG_LOG_EDITOR("Text matches requested:" << (actualText == content));
 }
 
 void EditorWindow::onLuaCursorMoveRequested(int line, int column)
 {
     CodeEditor* textEdit = getCurrentTextEditor();
     if (!textEdit) {
-        qWarning() << "No current text editor available";
+        DEBUG_LOG_EDITOR("No current text editor available");
         return;
     }
 
@@ -890,7 +890,7 @@ void EditorWindow::setupKeybindings()
 
         m_shortcuts[keySequence] = shortcut;
 
-        qDebug() << "✓ Registered keybinding:" << keySequence << "->" << action;
+        DEBUG_LOG_EDITOR("✓ Registered keybinding:" << keySequence << "->" << action);
     }
 
 }
@@ -947,7 +947,7 @@ void EditorWindow::executeAction(const QString &action)
 
         m_statusBar->showMessage("Language redetection feature is currently disabled", 2000);
     } else {
-        qWarning() << "Unknown action:" << action;
+        DEBUG_LOG_EDITOR("Unknown action:" << action);
     }
 }
 
@@ -997,7 +997,7 @@ void EditorWindow::detectAndSetLanguage(const QString &filePath)
 
     QString language = detectLanguageFromExtension(filePath);
 
-    qDebug() << "Detected language:" << language << "for file:" << filePath;
+    DEBUG_LOG_EDITOR("Detected language:" << language << "for file:" << filePath);
 
     highlighter->setLanguage(language);
 
@@ -1124,7 +1124,7 @@ int EditorWindow::createNewTab(const QString &title)
 
     highlighter->setLanguage("text");
 
-    qDebug() << "Created syntax highlighter for tab" << (m_tabWidget->count() - 1) << "with language: text";
+    DEBUG_LOG_EDITOR("Created syntax highlighter for tab" << (m_tabWidget->count() - 1) << "with language: text");
 
     connect(textEdit, &CodeEditor::textChanged, 
             this, &EditorWindow::onTextChanged);
@@ -1133,7 +1133,7 @@ int EditorWindow::createNewTab(const QString &title)
 
     int tabIndex = m_tabWidget->addTab(textEdit, title);
 
-    qDebug() << "Created new tab" << tabIndex << "with title:" << title;
+    DEBUG_LOG_EDITOR("Created new tab" << tabIndex << "with title:" << title);
 
     return tabIndex;
 }
@@ -1208,7 +1208,7 @@ void EditorWindow::setupSyntaxHighlightingForTab(int index)
     SyntaxHighlighter* highlighter = m_syntaxHighlighters[index];
 
     if (!textEdit || !highlighter) {
-        qWarning() << "Cannot setup syntax highlighting for tab" << index << ": missing components";
+        DEBUG_LOG_EDITOR("Cannot setup syntax highlighting for tab" << index << ": missing components");
         return;
     }
 
@@ -1220,7 +1220,7 @@ void EditorWindow::setupSyntaxHighlightingForTab(int index)
 
 void EditorWindow::onTabChanged(int index)
 {
-    qDebug() << "Tab changed to index:" << index;
+    DEBUG_LOG_EDITOR("Tab changed to index:" << index);
 
     updateWindowTitle();
     updateStatusBar();
@@ -1229,7 +1229,7 @@ void EditorWindow::onTabChanged(int index)
 
 void EditorWindow::onTabCloseRequested(int index)
 {
-    qDebug() << "Tab close requested for index:" << index;
+    DEBUG_LOG_EDITOR("Tab close requested for index:" << index);
 
     if (index < 0 || index >= m_buffers.size()) {
         return;
@@ -1308,7 +1308,7 @@ void EditorWindow::closeFile(int index)
     updateWindowTitle();
     updateStatusBar();
 
-    qDebug() << "Closed tab" << index << "- remaining tabs:" << m_tabWidget->count();
+    DEBUG_LOG_EDITOR("Closed tab" << index << "- remaining tabs:" << m_tabWidget->count());
 }
 
 void EditorWindow::closeCurrentFile()
@@ -1528,7 +1528,7 @@ void EditorWindow::setCurrentLanguage(const QString &language)
         return;
     }
 
-    qDebug() << "Setting language to:" << language << "for tab" << currentIndex;
+    DEBUG_LOG_EDITOR("Setting language to:" << language << "for tab" << currentIndex);
 
     highlighter->setLanguage(language);
 

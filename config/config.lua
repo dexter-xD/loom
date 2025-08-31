@@ -106,5 +106,5 @@ function set_config(key, value)
     current[keys[#keys]] = value
 end
 
--- print configuration loaded message
+-- configuration loaded message
 print("Configuration loaded successfully")

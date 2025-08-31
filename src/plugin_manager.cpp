@@ -1,6 +1,6 @@
 #include "plugin_manager.h"
 #include "lua_bridge.h"
-#include <QDebug>
+#include "debug_log.h"
 #include <QFileInfo>
 #include <QDirIterator>
 #include <QCoreApplication>
@@ -11,7 +11,7 @@ PluginManager::PluginManager(LuaBridge *luaBridge, QObject *parent)
     , m_cleanupTimer(new QTimer(this))
 {
     if (!m_luaBridge) {
-        qWarning() << "PluginManager: LuaBridge is null";
+        LOG_ERROR("PluginManager: LuaBridge is null");
         return;
     }
 
@@ -19,7 +19,7 @@ PluginManager::PluginManager(LuaBridge *luaBridge, QObject *parent)
     m_cleanupTimer->setInterval(5000); 
     connect(m_cleanupTimer, &QTimer::timeout, this, &PluginManager::cleanupFailedPlugins);
 
-    qDebug() << "PluginManager initialized";
+    DEBUG_LOG_PLUGIN("PluginManager initialized");
 }
 
 PluginManager::~PluginManager()
@@ -29,7 +29,7 @@ PluginManager::~PluginManager()
         cleanupPlugin(pluginName);
     }
 
-    qDebug() << "PluginManager destroyed";
+    DEBUG_LOG_PLUGIN("PluginManager destroyed");
 }
 
 bool PluginManager::loadPlugins(const QString &pluginDir)
@@ -39,11 +39,11 @@ bool PluginManager::loadPlugins(const QString &pluginDir)
     QDir dir(pluginDir);
     if (!dir.exists()) {
         setError(QString("Plugin directory does not exist: %1").arg(pluginDir));
-        qWarning() << m_lastError;
+        LOG_ERROR(m_lastError);
         return false;
     }
 
-    qDebug() << "Loading plugins from directory:" << pluginDir;
+    DEBUG_LOG_PLUGIN("Loading plugins from directory:" << pluginDir);
 
     scanPluginDirectory(pluginDir);
 
@@ -52,7 +52,7 @@ bool PluginManager::loadPlugins(const QString &pluginDir)
         QString pluginName = getPluginNameFromPath(pluginPath);
 
         if (!isPluginEnabled(pluginName)) {
-            qDebug() << "Plugin disabled, skipping:" << pluginName;
+            DEBUG_LOG_PLUGIN("Plugin disabled, skipping:" << pluginName);
             continue;
         }
 
@@ -61,7 +61,7 @@ bool PluginManager::loadPlugins(const QString &pluginDir)
         }
     }
 
-    qDebug() << "Loaded" << loadedCount << "plugins out of" << m_availablePlugins.size() << "available";
+    LOG_INFO("Loaded" << loadedCount << "plugins out of" << m_availablePlugins.size() << "available");
     return loadedCount > 0 || m_availablePlugins.isEmpty();
 }
 
@@ -75,7 +75,7 @@ bool PluginManager::loadPlugin(const QString &pluginPath)
     QString pluginName = getPluginNameFromPath(pluginPath);
 
     if (m_loadedPlugins.contains(pluginName)) {
-        qDebug() << "Plugin already loaded:" << pluginName;
+        DEBUG_LOG_PLUGIN("Plugin already loaded:" << pluginName);
         return true;
     }
 
@@ -91,7 +91,7 @@ bool PluginManager::loadPlugin(const QString &pluginPath)
             if (!errorRecovery) {
                 return false;
             }
-            qWarning() << "Plugin validation failed but continuing due to error recovery:" << pluginName;
+            DEBUG_LOG_PLUGIN("Plugin validation failed but continuing due to error recovery:" << pluginName);
         }
 
         if (!executePluginFile(pluginPath)) {
@@ -99,7 +99,7 @@ bool PluginManager::loadPlugin(const QString &pluginPath)
             if (!errorRecovery) {
                 return false;
             }
-            qWarning() << "Plugin execution failed but continuing due to error recovery:" << pluginName;
+            DEBUG_LOG_PLUGIN("Plugin execution failed but continuing due to error recovery:" << pluginName);
             return false; 
         }
 
@@ -108,25 +108,25 @@ bool PluginManager::loadPlugin(const QString &pluginPath)
             if (!errorRecovery) {
                 return false;
             }
-            qWarning() << "Plugin initialization failed but plugin loaded:" << pluginName;
+            DEBUG_LOG_PLUGIN("Plugin initialization failed but plugin loaded:" << pluginName);
 
         }
 
         m_loadedPlugins.append(pluginName);
         clearPluginError(pluginName);
 
-        qDebug() << "Plugin loaded successfully:" << pluginName;
+        LOG_INFO("Plugin loaded successfully:" << pluginName);
         emit pluginLoaded(pluginName);
 
         return true;
 
     } catch (const std::exception &e) {
         setPluginError(pluginName, QString("Plugin loading exception: %1").arg(e.what()));
-        qCritical() << "Exception while loading plugin" << pluginName << ":" << e.what();
+        LOG_ERROR("Exception while loading plugin" << pluginName << ":" << e.what());
         return false;
     } catch (...) {
         setPluginError(pluginName, "Unknown plugin loading error");
-        qCritical() << "Unknown exception while loading plugin" << pluginName;
+        LOG_ERROR("Unknown exception while loading plugin" << pluginName);
         return false;
     }
 }
@@ -134,13 +134,13 @@ bool PluginManager::loadPlugin(const QString &pluginPath)
 void PluginManager::unloadPlugin(const QString &pluginName)
 {
     if (!m_loadedPlugins.contains(pluginName)) {
-        qDebug() << "Plugin not loaded:" << pluginName;
+        DEBUG_LOG_PLUGIN("Plugin not loaded:" << pluginName);
         return;
     }
 
     if (cleanupPlugin(pluginName)) {
         m_loadedPlugins.removeAll(pluginName);
-        qDebug() << "Plugin unloaded successfully:" << pluginName;
+        DEBUG_LOG_PLUGIN("Plugin unloaded successfully:" << pluginName);
         emit pluginUnloaded(pluginName);
     } else {
         setPluginError(pluginName, QString("Plugin cleanup failed: %1").arg(m_lastError));
@@ -150,7 +150,7 @@ void PluginManager::unloadPlugin(const QString &pluginName)
 
 void PluginManager::reloadPlugins()
 {
-    qDebug() << "Reloading all plugins";
+    DEBUG_LOG_PLUGIN("Reloading all plugins");
 
     QStringList currentPlugins = m_loadedPlugins;
     for (const QString &pluginName : currentPlugins) {
@@ -245,7 +245,7 @@ void PluginManager::cleanupFailedPlugins()
 
     for (const QString &pluginName : failedPlugins) {
         m_loadedPlugins.removeAll(pluginName);
-        qDebug() << "Removed failed plugin from loaded list:" << pluginName;
+        DEBUG_LOG_PLUGIN("Removed failed plugin from loaded list:" << pluginName);
     }
 }
 
@@ -258,11 +258,11 @@ void PluginManager::scanPluginDirectory(const QString &dir)
         QString filePath = iterator.next();
         if (isValidPluginFile(filePath)) {
             m_availablePlugins.append(filePath);
-            qDebug() << "Found plugin file:" << filePath;
+            DEBUG_LOG_PLUGIN("Found plugin file:" << filePath);
         }
     }
 
-    qDebug() << "Scanned plugin directory, found" << m_availablePlugins.size() << "plugin files";
+    DEBUG_LOG_PLUGIN("Scanned plugin directory, found" << m_availablePlugins.size() << "plugin files");
 }
 
 bool PluginManager::isValidPluginFile(const QString &filePath) const
@@ -336,7 +336,7 @@ bool PluginManager::initializePlugin(const QString &pluginName)
         return false;
     }
 
-    qDebug() << "Plugin initialized:" << pluginName;
+    DEBUG_LOG_PLUGIN("Plugin initialized:" << pluginName);
     return true;
 }
 
@@ -351,7 +351,9 @@ bool PluginManager::cleanupPlugin(const QString &pluginName)
         "if %1 and type(%1.cleanup) == 'function' then "
         "  local success, err = pcall(%1.cleanup) "
         "  if not success then "
-        "    print('Plugin cleanup warning: ' .. tostring(err)) "
+        "    if editor and editor.debug_log then "
+        "      editor.debug_log('Plugin cleanup warning: ' .. tostring(err)) "
+        "    end "
         "  end "
         "end "
         "%1 = nil"
@@ -362,14 +364,14 @@ bool PluginManager::cleanupPlugin(const QString &pluginName)
         return false;
     }
 
-    qDebug() << "Plugin cleaned up:" << pluginName;
+    DEBUG_LOG_PLUGIN("Plugin cleaned up:" << pluginName);
     return true;
 }
 
 void PluginManager::setError(const QString &error)
 {
     m_lastError = error;
-    qWarning() << "PluginManager error:" << error;
+    LOG_ERROR("PluginManager error:" << error);
 }
 
 void PluginManager::setPluginError(const QString &pluginName, const QString &error)

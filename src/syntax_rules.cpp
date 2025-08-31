@@ -4,7 +4,7 @@
 
 #include "syntax_rules.h"
 #include "syntax_highlighter.h"
-#include <QDebug>
+#include "debug_log.h"
 
 // ═══════════════════════════════════════════════════════════════
 //                         C++ RULES
@@ -590,10 +590,10 @@ void SyntaxRules::applyRules(SyntaxHighlighter *highlighter, const QString &lang
     }
     
     // Apply all rules to the highlighter
-    qDebug() << "SyntaxRules: Applying" << rules.size() << "rules for language:" << language;
+    DEBUG_LOG_SYNTAX("SyntaxRules: Applying" << rules.size() << "rules for language:" << language);
     for (const auto &rule : rules) {
-        qDebug() << "  Adding rule:" << rule.pattern << "with color:" << rule.colorName;
+        DEBUG_LOG_SYNTAX("  Adding rule:" << rule.pattern << "with color:" << rule.colorName);
         highlighter->addRule(rule.pattern, rule.colorName);
     }
-    qDebug() << "SyntaxRules: All rules applied successfully";
+    DEBUG_LOG_SYNTAX("SyntaxRules: All rules applied successfully");
 }

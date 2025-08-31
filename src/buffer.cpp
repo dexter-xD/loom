@@ -6,7 +6,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QFileInfo>
-#include <QDebug>
+#include "debug_log.h"
 
 Buffer::Buffer(const QString &filePath)
     : m_filePath(filePath)
@@ -149,7 +149,7 @@ bool Buffer::writeToFile(const QString &filePath)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qWarning() << "Failed to open file for writing:" << filePath << file.errorString();
+        LOG_ERROR("Failed to open file for writing:" << filePath << file.errorString());
         return false;
     }
     
@@ -163,7 +163,7 @@ bool Buffer::readFromFile(const QString &filePath)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Failed to open file for reading:" << filePath << file.errorString();
+        LOG_ERROR("Failed to open file for reading:" << filePath << file.errorString());
         return false;
     }
     
