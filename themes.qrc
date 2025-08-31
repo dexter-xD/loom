@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>themes/gruvbox.qss</file>
+        <file>assets/icon.png</file>
+    </qresource>
+</RCC>

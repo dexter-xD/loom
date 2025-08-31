@@ -1,0 +1,33 @@
+# build directories
+build/
+cmake-build-*/
+
+# compiled binaries
+loom
+loom.exe
+
+# cmake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+
+# qt generated files
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+
+# ide files
+.vscode/
+.idea/
+*.pro.user
+
+# os specific files
+.DS_Store
+Thumbs.db
+
+# temporary files
+*.tmp
+*.bak
+*~
