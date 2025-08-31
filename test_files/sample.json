@@ -1,0 +1,16 @@
+{
+  "name": "Sample JSON",
+  "version": "1.0.0",
+  "description": "A sample JSON file for testing",
+  "features": [
+    "syntax highlighting",
+    "file dialogs",
+    "multiple file types"
+  ],
+  "config": {
+    "editor": {
+      "theme": "gruvbox",
+      "font_size": 14
+    }
+  }
+}
