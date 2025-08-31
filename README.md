@@ -58,7 +58,7 @@ Before building Loom, ensure you have the following installed:
 #### Linux (Ubuntu/Debian) - DEB Package (Recommended)
 ```bash
 # Download the latest DEB package from GitHub releases
-wget https://github.com/dexter-xd/loom/releases/download/v1.0.0-beta/loom_1.0.0_amd64.deb
+wget https://github.com/dexter-xd/loom/releases/download/beta_1.0.0/loom_1.0.0_amd64.deb
 
 # Install the package
 sudo dpkg -i loom_1.0.0_amd64.deb
