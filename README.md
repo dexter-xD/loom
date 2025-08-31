@@ -62,7 +62,7 @@ sudo apt update
 sudo apt install cmake qt5-default qtbase5-dev liblua5.4-dev build-essential
 
 # Clone the repository
-git clone https://github.com/your-username/loom.git
+git clone https://github.com/dexter-xd/loom.git
 cd loom
 
 # Build using the provided script
@@ -79,7 +79,7 @@ chmod +x scripts/build_release.sh
 sudo dnf install cmake qt5-qtbase-devel lua-devel gcc-c++
 
 # Clone and build
-git clone https://github.com/your-username/loom.git
+git clone https://github.com/dexter-xd/loom.git
 cd loom
 chmod +x scripts/build_release.sh
 ./scripts/build_release.sh
@@ -91,7 +91,7 @@ chmod +x scripts/build_release.sh
 brew install cmake qt@5 lua
 
 # Clone and build
-git clone https://github.com/your-username/loom.git
+git clone https://github.com/dexter-xd/loom.git
 cd loom
 chmod +x scripts/build_release.sh
 ./scripts/build_release.sh
