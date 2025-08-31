@@ -1,0 +1,32 @@
+Source: loom
+Section: editors
+Priority: optional
+Maintainer: dexter-xd <dexter-xd@users.noreply.github.com>
+Build-Depends: debhelper (>= 12), cmake (>= 3.16), qtbase5-dev (>= 5.12), liblua5.4-dev | liblua5.3-dev, pkg-config, build-essential
+Standards-Version: 4.5.1
+Homepage: https://github.com/dexter-xd/loom
+Vcs-Git: https://github.com/dexter-xd/loom.git
+Vcs-Browser: https://github.com/dexter-xd/loom
+
+Package: loom
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5core5a (>= 5.12), libqt5widgets5 (>= 5.12), libqt5gui5 (>= 5.12), liblua5.4-0 | liblua5.3-0
+Recommends: clang-format, prettier, python3-black, nodejs, npm
+Suggests: stylua, rustfmt
+Description: A fast, minimal, and customizable text editor
+ Loom is a fast, minimal, and customizable text editor built with C++ and Qt,
+ featuring Lua scripting for configuration and plugins. It includes syntax
+ highlighting, multi-tab interface, customizable keybindings, and an extensible
+ plugin system.
+ .
+ Features:
+  * Lightweight & Fast - Minimal resource usage with responsive text editing
+  * Gruvbox Theme - Beautiful, consistent dark theme for comfortable coding
+  * Syntax Highlighting - Support for multiple programming languages
+  * Multi-Tab Interface - Manage multiple files with tabbed interface
+  * Customizable Keybindings - Configure shortcuts to match your workflow
+  * Line Numbers - Optional line number display with relative numbering
+  * Find & Replace - Built-in search and replace functionality
+  * Plugin System - Lua-based plugin system for unlimited customization
+  * AutoSave Plugin - Automatic file saving with configurable intervals
+  * AutoFormat Plugin - Code formatting with external formatters

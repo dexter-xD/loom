@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Loom
+Comment=A fast, minimal, and customizable text editor
+Exec=loom %F
+Icon=loom
+Terminal=false
+StartupNotify=true
+MimeType=text/plain;text/x-chdr;text/x-csrc;text/x-c++hdr;text/x-c++src;text/x-java;text/x-makefile;text/x-python;application/x-shellscript;text/x-lua;application/javascript;application/json;text/html;text/css;text/x-rust;
+Categories=Development;TextEditor;Utility;
+Keywords=editor;text;development;programming;code;
+StartupWMClass=loom

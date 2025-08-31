@@ -55,11 +55,24 @@ Before building Loom, ensure you have the following installed:
 
 ### Installation
 
-#### Linux (Ubuntu/Debian)
+#### Linux (Ubuntu/Debian) - DEB Package (Recommended)
+```bash
+# Download the latest DEB package from GitHub releases
+wget https://github.com/dexter-xd/loom/releases/download/v1.0.0-beta/loom_1.0.0_amd64.deb
+
+# Install the package
+sudo dpkg -i loom_1.0.0_amd64.deb
+sudo apt-get install -f  # Fix any dependency issues
+
+# Run Loom
+loom
+```
+
+#### Linux (Ubuntu/Debian) - Build from Source
 ```bash
 # Install dependencies
 sudo apt update
-sudo apt install cmake qt5-default qtbase5-dev liblua5.4-dev build-essential
+sudo apt install cmake qtbase5-dev liblua5.4-dev build-essential
 
 # Clone the repository
 git clone https://github.com/dexter-xd/loom.git
@@ -96,12 +109,6 @@ cd loom
 chmod +x scripts/build_release.sh
 ./scripts/build_release.sh
 ```
-
-#### Windows
-1. Install Qt5 from the [official installer](https://www.qt.io/download)
-2. Install Lua development libraries
-3. Use Visual Studio or MinGW for compilation
-4. Follow the manual build instructions below
 
 ### Build Options
 
@@ -526,6 +533,30 @@ Test your changes with the provided sample files in `test_files/`:
 ./scripts/run_loom.sh test_files/sample.py
 ./scripts/run_loom.sh test_files/sample.lua
 ```
+
+### Creating DEB Packages
+
+For maintainers and contributors who want to create distribution packages:
+
+```bash
+# Build, test, and package everything in one command
+./scripts/package.sh
+```
+
+This single script will:
+- Build the optimized release binary
+- Create the DEB package with proper dependencies
+- Run comprehensive tests to verify package integrity
+- Display detailed package information and statistics
+- Provide installation instructions
+
+The DEB package includes:
+- Compiled binary (`/usr/bin/loom`)
+- Configuration files (`/usr/share/loom/config/`)
+- Plugin system (`/usr/share/loom/plugins/`)
+- Themes (`/usr/share/loom/themes/`)
+- Desktop integration (`.desktop` file and icon)
+- Proper dependency management
 
 ## Contributing
 

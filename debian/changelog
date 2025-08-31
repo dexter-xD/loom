@@ -1,0 +1,15 @@
+loom (1.0.0-1) unstable; urgency=medium
+
+  * Initial beta release of Loom text editor
+  * Fast, minimal, and customizable text editor built with C++ and Qt
+  * Features Lua scripting for configuration and plugins
+  * Includes syntax highlighting for multiple programming languages
+  * Multi-tab interface with customizable keybindings
+  * Gruvbox theme for comfortable coding
+  * Plugin system with AutoSave and AutoFormat plugins
+  * AutoFormat plugin supports clang-format, prettier, black, stylua, rustfmt
+  * Line numbers with optional relative numbering
+  * Find & Replace functionality
+  * Cross-platform compatibility
+
+ -- dexter-xd <dexter-xd@users.noreply.github.com>  Mon, 01 Sep 2025 
