@@ -240,8 +240,11 @@ void LuaBridge::setupLuaPath()
     QString appDir = QCoreApplication::applicationDirPath();
     QString configDir = appDir + "/config";
     QString pluginDir = appDir + "/plugins";
+    
+    QString systemConfigDir = "/usr/share/loom/config";
+    QString systemPluginDir = "/usr/share/loom/plugins";
 
-    QString luaPath = QString("%1/?.lua;%2/?.lua;").arg(configDir, pluginDir);
+    QString luaPath = QString("%1/?.lua;%2/?.lua;%3/?.lua;%4/?.lua;").arg(configDir, pluginDir, systemConfigDir, systemPluginDir);
 
     lua_getglobal(m_lua, "package");
     lua_pushstring(m_lua, luaPath.toUtf8().constData());

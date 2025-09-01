@@ -710,7 +710,11 @@ void EditorWindow::loadConfiguration()
 
     if (!QFile::exists(configPath)) {
         configPath = "config/config.lua";
-
+    }
+    
+    // Check system installation path for DEB package
+    if (!QFile::exists(configPath)) {
+        configPath = "/usr/share/loom/config/config.lua";
     }
 
     if (QFile::exists(configPath)) {
@@ -738,7 +742,10 @@ void EditorWindow::loadPlugins()
 
     if (!QDir(pluginDir).exists()) {
         pluginDir = "plugins";
-
+    }
+    
+    if (!QDir(pluginDir).exists()) {
+        pluginDir = "/usr/share/loom/plugins";
     }
 
     if (QDir(pluginDir).exists()) {
