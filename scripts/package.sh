@@ -177,7 +177,7 @@ else
     exit 1
 fi
 
-if echo "$PACKAGE_INFO" | grep -q "Version: 1.0.0"; then
+if echo "$PACKAGE_INFO" | grep -q "Version: 1.1.0"; then
     echo "    ✅ Package version correct"
 else
     echo "    ❌ Package version incorrect"

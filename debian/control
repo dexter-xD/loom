@@ -17,16 +17,18 @@ Description: A fast, minimal, and customizable text editor
  Loom is a fast, minimal, and customizable text editor built with C++ and Qt,
  featuring Lua scripting for configuration and plugins. It includes syntax
  highlighting, multi-tab interface, customizable keybindings, and an extensible
- plugin system.
+ plugin system with multiple beautiful themes.
  .
  Features:
   * Lightweight & Fast - Minimal resource usage with responsive text editing
-  * Gruvbox Theme - Beautiful, consistent dark theme for comfortable coding
+  * Multiple Themes - Choose from Gruvbox, Dracula, and Catppuccin Mocha
+  * Theme Switching - Toggle between themes with Ctrl+Shift+T or Tools menu
   * Syntax Highlighting - Support for multiple programming languages
   * Multi-Tab Interface - Manage multiple files with tabbed interface
   * Customizable Keybindings - Configure shortcuts to match your workflow
   * Line Numbers - Optional line number display with relative numbering
   * Find & Replace - Built-in search and replace functionality
-  * Plugin System - Lua-based plugin system for unlimited customization
+  * Enhanced Plugin System - Lua-based plugins with dynamic menu updates
+  * Theme Switcher Plugin - Easy theme management with keyboard shortcuts
   * AutoSave Plugin - Automatic file saving with configurable intervals
-  * AutoFormat Plugin - Code formatting with external formatters
+  * AutoFormat Plugin - Code formatting with external formatters and menu access

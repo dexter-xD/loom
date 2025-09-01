@@ -19,8 +19,13 @@ case "$1" in
             update-mime-database /usr/share/mime || true
         fi
         
-        echo "Loom text editor installed successfully!"
+        echo "Loom text editor v1.1.0 installed successfully!"
         echo "Run 'loom' to start the editor."
+        echo ""
+        echo "New in v1.1.0:"
+        echo "  • Multiple themes: Gruvbox, Dracula, Catppuccin Mocha"
+        echo "  • Theme switching: Press Ctrl+Shift+T or use Tools menu"
+        echo "  • Enhanced plugin system with dynamic menus"
         echo ""
         echo "Note: For AutoFormat plugin functionality, install formatters:"
         echo "  sudo apt install clang-format nodejs npm python3-pip"

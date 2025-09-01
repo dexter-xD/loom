@@ -1,3 +1,25 @@
+loom (1.1.0-1) unstable; urgency=medium
+
+  * Major update with theme switching and enhanced plugin system
+  * NEW: Multiple themes - Gruvbox, Dracula, and Catppuccin Mocha
+  * NEW: Theme switching with Ctrl+Shift+T or Tools menu
+  * NEW: Theme Switcher Plugin v1.2 with metadata support
+  * NEW: Dynamic theme loading without restart
+  * NEW: Config-based theme selection in config.lua
+  * ENHANCED: Plugin system with proper validation and metadata
+  * ENHANCED: Dynamic menu updates based on plugin status
+  * ENHANCED: Tools menu integration for plugin actions
+  * ENHANCED: Keybinding consistency for all plugin actions
+  * ENHANCED: AutoFormat plugin with Ctrl+Shift+F and menu access
+  * FIXED: Theme switcher boolean configuration being ignored
+  * FIXED: Theme switching only working once (config update issue)
+  * FIXED: Plugin keybindings showing errors when plugins disabled
+  * FIXED: Menu items always visible regardless of plugin status
+  * IMPROVED: Plugin loading sequence and menu refresh logic
+  * IMPROVED: Plugin validation for enabled/auto_load settings
+
+ -- dexter-xd <dexter-xd@users.noreply.github.com>  Mon, 01 Sep 2025 19:51:00 +0530
+
 loom (1.0.0-1) unstable; urgency=medium
 
   * Initial beta release of Loom text editor
