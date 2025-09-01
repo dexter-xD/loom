@@ -3,6 +3,7 @@
 
 #include <QPlainTextEdit>
 #include <QObject>
+#include <QColor>
 
 QT_BEGIN_NAMESPACE
 class QPaintEvent;
@@ -35,6 +36,9 @@ public:
     void setCurrentLineHighlightEnabled(bool enabled);
     bool currentLineHighlightEnabled() const { return m_currentLineHighlightEnabled; }
     
+    void setThemeColors(const QColor &background, const QColor &currentLine, const QColor &normalLine);
+    void updateThemeColors();
+    
 protected:
     void resizeEvent(QResizeEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
@@ -50,6 +54,11 @@ private:
     bool m_lineNumbersVisible;
     bool m_autoIndentEnabled;
     bool m_currentLineHighlightEnabled;
+    
+    // Theme colors for line numbers
+    QColor m_lineNumberBackground;
+    QColor m_lineNumberCurrentLine;
+    QColor m_lineNumberNormal;
 };
 
 #endif 

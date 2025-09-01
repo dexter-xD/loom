@@ -5,7 +5,7 @@
 
 set -e
 
-VERSION="1.0.0"
+VERSION="1.1.0"
 PACKAGE_NAME="loom"
 PACKAGE_FILE="${PACKAGE_NAME}_${VERSION}_amd64.deb"
 

@@ -12,6 +12,9 @@ CodeEditor::CodeEditor(QWidget *parent)
     , m_lineNumbersVisible(true)
     , m_autoIndentEnabled(true)
     , m_currentLineHighlightEnabled(true)
+    , m_lineNumberBackground(40, 37, 34)     
+    , m_lineNumberCurrentLine(251, 241, 199)
+    , m_lineNumberNormal(146, 131, 116)
 {
     lineNumberArea = new LineNumberArea(this);
 
@@ -91,7 +94,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     }
 
     QPainter painter(lineNumberArea);
-    painter.fillRect(event->rect(), QColor(40, 37, 34));
+    painter.fillRect(event->rect(), m_lineNumberBackground);
 
     QTextBlock block = firstVisibleBlock();
     int blockNumber = block.blockNumber();
@@ -112,9 +115,9 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
             }
             
             if (blockNumber == currentLine) {
-                painter.setPen(QColor(251, 241, 199));
+                painter.setPen(m_lineNumberCurrentLine);
             } else {
-                painter.setPen(QColor(146, 131, 116));
+                painter.setPen(m_lineNumberNormal);
             }
             
             painter.drawText(0, top, lineNumberArea->width() - 5, fontMetrics().height(),
@@ -170,5 +173,33 @@ void CodeEditor::keyPressEvent(QKeyEvent *event)
         insertPlainText(indentString);
     } else {
         QPlainTextEdit::keyPressEvent(event);
+    }
+}
+
+void CodeEditor::setThemeColors(const QColor &background, const QColor &currentLine, const QColor &normalLine)
+{
+    m_lineNumberBackground = background;
+    m_lineNumberCurrentLine = currentLine;
+    m_lineNumberNormal = normalLine;
+    
+    if (lineNumberArea) {
+        lineNumberArea->update();
+    }
+}
+
+void CodeEditor::updateThemeColors()
+{
+    
+    QPalette palette = this->palette();
+    QColor baseColor = palette.color(QPalette::Base);
+    QColor textColor = palette.color(QPalette::Text);
+    
+    m_lineNumberBackground = baseColor.darker(110);
+    
+    m_lineNumberCurrentLine = textColor;
+    m_lineNumberNormal = textColor.darker(150);
+    
+    if (lineNumberArea) {
+        lineNumberArea->update();
     }
 }

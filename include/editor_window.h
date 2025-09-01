@@ -84,8 +84,10 @@ private slots:
     void onLuaTextChangeRequested(const QString &content);
     void onLuaCursorMoveRequested(int line, int column);
     void onLuaStatusMessageRequested(const QString &message);
+    void onLuaThemeChangeRequested(const QString &themeName);
 
     void executeAction(const QString &action);
+    bool isPluginActionEnabled(const QString &pluginName) const;
 
     void updateLuaEditorState();
 
@@ -106,6 +108,7 @@ private:
 
     void setupUI();
     void setupMenus();
+    void refreshToolsMenu();
     void setupStatusBar();
     void connectSignals();
 
@@ -131,6 +134,10 @@ private:
     void replaceText(const QString &searchText, const QString &replaceText, bool replaceAll = false);
 
     void setCurrentLanguage(const QString &language);
+    
+    void loadTheme(const QString &themeName);
+    void applyTheme();
+    void updateEditorThemeColors(const QString &themeName);
 };
 
 #endif 

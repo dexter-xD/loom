@@ -45,7 +45,6 @@ EditorWindow::EditorWindow(QWidget *parent)
             });
 
     setupUI();
-    setupMenus();
     setupStatusBar();
     connectSignals();
 
@@ -58,11 +57,7 @@ EditorWindow::EditorWindow(QWidget *parent)
 
     loadPlugins();
 
-    if (m_luaBridge) {
-        QVariantList args;
-        args << "gruvbox"; 
-        m_luaBridge->emitEvent("theme_changed", args);
-    }
+    setupMenus();
 
     updateLuaEditorState();
 
@@ -251,24 +246,61 @@ void EditorWindow::setupMenus()
         languageMenu->addAction(langAction);
     }
 
-    QMenu *toolsMenu = menuBar()->addMenu("&Tools");
+    menuBar()->addMenu("&Tools");
+    refreshToolsMenu();
+}
 
-    QAction *formatAction = new QAction("&Format Document", this);
-    formatAction->setStatusTip("Format the current document using auto-formatter");
-    formatAction->setShortcut(QKeySequence("Ctrl+Shift+F"));
-    connect(formatAction, &QAction::triggered, [this]() {
-        if (m_luaBridge) {
-            QString formatScript = "if autoformat then autoformat.format_document() end";
-            if (m_luaBridge->executeString(formatScript)) {
-                m_statusBar->showMessage("Document formatted", 2000);
-            } else {
-                m_statusBar->showMessage("Format failed: Auto-formatter not available", 3000);
-            }
+void EditorWindow::refreshToolsMenu()
+{
+
+    QMenu *toolsMenu = nullptr;
+    for (QAction *action : menuBar()->actions()) {
+        if (action->text() == "&Tools") {
+            toolsMenu = action->menu();
+            break;
         }
-    });
-    toolsMenu->addAction(formatAction);
+    }
 
-    toolsMenu->addSeparator();
+    if (!toolsMenu) {
+        return;
+    }
+
+    toolsMenu->clear();
+
+    bool hasPluginMenuItems = false;
+
+    if (isPluginActionEnabled("autoformat")) {
+        QAction *formatAction = new QAction("&Format Document", this);
+        formatAction->setStatusTip("Format the current document using auto-formatter");
+        connect(formatAction, &QAction::triggered, [this]() {
+            if (m_luaBridge) {
+                QString formatScript = "if autoformat then autoformat.format_document() end";
+                if (m_luaBridge->executeString(formatScript)) {
+                    m_statusBar->showMessage("Document formatted", 2000);
+                } else {
+                    m_statusBar->showMessage("Format failed: Auto-formatter error", 3000);
+                }
+            }
+        });
+        toolsMenu->addAction(formatAction);
+        hasPluginMenuItems = true;
+    }
+
+    if (isPluginActionEnabled("theme_switcher")) {
+        QAction *toggleThemeAction = new QAction("&Toggle Theme", this);
+        toggleThemeAction->setStatusTip("Switch to the next available theme");
+        connect(toggleThemeAction, &QAction::triggered, [this]() {
+            if (m_luaBridge) {
+                m_luaBridge->executeString("toggle_theme()");
+            }
+        });
+        toolsMenu->addAction(toggleThemeAction);
+        hasPluginMenuItems = true;
+    }
+
+    if (hasPluginMenuItems) {
+        toolsMenu->addSeparator();
+    }
 
     QAction *reloadPluginsAction = new QAction("&Reload Plugins", this);
     reloadPluginsAction->setStatusTip("Reload all plugins from the plugins directory");
@@ -277,6 +309,8 @@ void EditorWindow::setupMenus()
             m_pluginManager->reloadPlugins();
             QStringList loadedPlugins = m_pluginManager->loadedPlugins();
             m_statusBar->showMessage(QString("Reloaded %1 plugin(s)").arg(loadedPlugins.size()), 3000);
+
+            refreshToolsMenu();
         }
     });
     toolsMenu->addAction(reloadPluginsAction);
@@ -333,6 +367,8 @@ void EditorWindow::connectSignals()
                 this, &EditorWindow::onLuaCursorMoveRequested);
         connect(m_luaBridge, &LuaBridge::statusMessageRequested,
                 this, &EditorWindow::onLuaStatusMessageRequested);
+        connect(m_luaBridge, &LuaBridge::themeChangeRequested,
+                this, &EditorWindow::onLuaThemeChangeRequested);
     }
 }
 
@@ -775,6 +811,8 @@ void EditorWindow::applyConfiguration()
 
     resize(windowWidth, windowHeight);
 
+    applyTheme();
+
 }
 
 void EditorWindow::onLuaFileOpenRequested(const QString &filePath)
@@ -895,6 +933,18 @@ void EditorWindow::setupKeybindings()
 
 }
 
+bool EditorWindow::isPluginActionEnabled(const QString &pluginName) const
+{
+    if (!m_luaBridge) {
+        return false;
+    }
+
+    bool pluginEnabled = m_luaBridge->getConfigBool(QString("plugins.%1.enabled").arg(pluginName), false);
+    bool autoLoad = m_luaBridge->getConfigBool(QString("plugins.%1.auto_load").arg(pluginName), false);
+
+    return pluginEnabled && autoLoad;
+}
+
 void EditorWindow::executeAction(const QString &action)
 {
 
@@ -946,6 +996,27 @@ void EditorWindow::executeAction(const QString &action)
     } else if (action == "redetect_language") {
 
         m_statusBar->showMessage("Language redetection feature is currently disabled", 2000);
+    } else if (action == "toggle_theme") {
+        if (isPluginActionEnabled("theme_switcher")) {
+            if (m_luaBridge) {
+                m_luaBridge->executeString("toggle_theme()");
+            }
+        } else {
+            m_statusBar->showMessage("Theme switcher plugin is disabled", 2000);
+        }
+    } else if (action == "format_document") {
+        if (isPluginActionEnabled("autoformat")) {
+            if (m_luaBridge) {
+                QString formatScript = "if autoformat then autoformat.format_document() end";
+                if (m_luaBridge->executeString(formatScript)) {
+                    m_statusBar->showMessage("Document formatted", 2000);
+                } else {
+                    m_statusBar->showMessage("Format failed: Auto-formatter error", 3000);
+                }
+            }
+        } else {
+            m_statusBar->showMessage("Auto-formatter plugin is disabled", 2000);
+        }
     } else {
         DEBUG_LOG_EDITOR("Unknown action:" << action);
     }
@@ -1085,12 +1156,31 @@ int EditorWindow::createNewTab(const QString &title)
     CodeEditor* textEdit = new CodeEditor();
     m_textEditors.append(textEdit);
 
-    QPalette palette = textEdit->palette();
-    palette.setColor(QPalette::Base, QColor("#282828"));        
-    palette.setColor(QPalette::Text, QColor("#ebdbb2"));        
-    palette.setColor(QPalette::Highlight, QColor("#458588"));   
-    palette.setColor(QPalette::HighlightedText, QColor("#ebdbb2")); 
-    textEdit->setPalette(palette);
+    if (m_luaBridge) {
+        QString currentTheme = m_luaBridge->getConfigString("theme.name", "gruvbox");
+
+        QColor background, currentLine, normalLine;
+        if (currentTheme == "gruvbox") {
+            background = QColor(40, 37, 34);
+            currentLine = QColor(251, 241, 199);
+            normalLine = QColor(146, 131, 116);
+        } else if (currentTheme == "dracula") {
+            background = QColor(33, 34, 44);
+            currentLine = QColor(248, 248, 242);
+            normalLine = QColor(98, 114, 164);
+        } else if (currentTheme == "catppuccin-mocha") {
+            background = QColor(24, 24, 37);
+            currentLine = QColor(205, 214, 244);
+            normalLine = QColor(166, 173, 200);
+        } else {
+
+            background = QColor(40, 37, 34);
+            currentLine = QColor(251, 241, 199);
+            normalLine = QColor(146, 131, 116);
+        }
+
+        textEdit->setThemeColors(background, currentLine, normalLine);
+    }
 
     if (m_luaBridge) {
         QString fontFamily = m_luaBridge->getConfigString("editor.font_family", "JetBrains Mono");
@@ -1539,4 +1629,88 @@ void EditorWindow::setCurrentLanguage(const QString &language)
     highlighter->rehighlight();
 
     m_statusBar->showMessage(QString("Syntax highlighting set to: %1").arg(language.toUpper()), 3000);
+}
+
+void EditorWindow::loadTheme(const QString &themeName)
+{
+    DEBUG_LOG_EDITOR("loadTheme called with theme:" << themeName);
+    QString themeFile = QString(":/themes/%1.qss").arg(themeName);
+    DEBUG_LOG_EDITOR("Theme file path:" << themeFile);
+    QFile styleFile(themeFile);
+
+    if (styleFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream stream(&styleFile);
+        QString styleSheet = stream.readAll();
+        qApp->setStyleSheet(styleSheet);
+
+        DEBUG_LOG_EDITOR("Theme loaded successfully:" << themeName);
+        m_statusBar->showMessage(QString("Theme changed to: %1").arg(themeName), 3000);
+
+        if (m_luaBridge) {
+            QString setConfigCode = QString("set_config('theme.name', '%1')").arg(themeName);
+            m_luaBridge->executeString(setConfigCode);
+        }
+
+        updateEditorThemeColors(themeName);
+
+        if (m_luaBridge) {
+            QVariantList args;
+            args << themeName;
+            m_luaBridge->emitEvent("theme_changed", args);
+        }
+    } else {
+        DEBUG_LOG_EDITOR("Failed to load theme:" << themeName);
+        m_statusBar->showMessage(QString("Failed to load theme: %1").arg(themeName), 3000);
+    }
+}
+
+void EditorWindow::applyTheme()
+{
+    if (!m_luaBridge) {
+        DEBUG_LOG_EDITOR("applyTheme: m_luaBridge is null");
+        return;
+    }
+
+    QString themeName = m_luaBridge->getConfigString("theme.name", "gruvbox");
+    DEBUG_LOG_EDITOR("applyTheme: Loading theme:" << themeName);
+    loadTheme(themeName);
+}
+
+void EditorWindow::onLuaThemeChangeRequested(const QString &themeName)
+{
+    loadTheme(themeName);
+}
+
+void EditorWindow::updateEditorThemeColors(const QString &themeName)
+{
+
+    QColor background, currentLine, normalLine;
+
+    if (themeName == "gruvbox") {
+        background = QColor(40, 37, 34);        
+        currentLine = QColor(251, 241, 199);    
+        normalLine = QColor(146, 131, 116);     
+    } else if (themeName == "dracula") {
+        background = QColor(33, 34, 44);        
+        currentLine = QColor(248, 248, 242);    
+        normalLine = QColor(98, 114, 164);      
+    } else if (themeName == "catppuccin-mocha") {
+        background = QColor(24, 24, 37);        
+        currentLine = QColor(205, 214, 244);    
+        normalLine = QColor(166, 173, 200);     
+    } else {
+
+        for (CodeEditor* editor : m_textEditors) {
+            if (editor) {
+                editor->updateThemeColors();
+            }
+        }
+        return;
+    }
+
+    for (CodeEditor* editor : m_textEditors) {
+        if (editor) {
+            editor->setThemeColors(background, currentLine, normalLine);
+        }
+    }
 }

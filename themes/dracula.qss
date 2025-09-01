@@ -1,0 +1,326 @@
+/* Dracula theme stylesheet for Loom text editor */
+/* implements complete Dracula color palette for consistent theming */
+/* version -- 1.0.0 */
+
+/* Dracula color palette */
+/* background: #282a36, current_line: #44475a, selection: #44475a */
+/* foreground: #f8f8f2, comment: #6272a4, cyan: #8be9fd */
+/* green: #50fa7b, orange: #ffb86c, pink: #ff79c6 */
+/* purple: #bd93f9, red: #ff5555, yellow: #f1fa8c */
+
+/* main window styling */
+QMainWindow {
+    background-color: #282a36;
+    color: #f8f8f2;
+}
+
+/* menu bar styling */
+QMenuBar {
+    background-color: #44475a;
+    color: #f8f8f2;
+    border-bottom: 1px solid #6272a4;
+    padding: 2px;
+}
+
+QMenuBar::item {
+    background-color: transparent;
+    padding: 4px 8px;
+    margin: 2px;
+    border-radius: 3px;
+}
+
+QMenuBar::item:selected {
+    background-color: #6272a4;
+    color: #f8f8f2;
+}
+
+QMenuBar::item:pressed {
+    background-color: #bd93f9;
+}
+
+/* menu styling */
+QMenu {
+    background-color: #44475a;
+    color: #f8f8f2;
+    border: 1px solid #6272a4;
+    padding: 4px;
+}
+
+QMenu::item {
+    padding: 6px 20px;
+    border-radius: 3px;
+}
+
+QMenu::item:selected {
+    background-color: #6272a4;
+    color: #f8f8f2;
+}
+
+QMenu::separator {
+    height: 1px;
+    background-color: #6272a4;
+    margin: 4px 0px;
+}
+
+/* text editor styling */
+QPlainTextEdit {
+    background-color: #282a36;
+    color: #f8f8f2;
+    border: none;
+    selection-background-color: #44475a;
+    selection-color: #f8f8f2;
+    line-height: 1.4;
+}
+
+/* status bar styling */
+QStatusBar {
+    background-color: #44475a;
+    color: #f8f8f2;
+    border-top: 1px solid #6272a4;
+    padding: 2px;
+}
+
+QStatusBar::item {
+    border: none;
+}
+
+/* dialog styling */
+QDialog {
+    background-color: #282a36;
+    color: #f8f8f2;
+}
+
+QLabel {
+    color: #f8f8f2;
+}
+
+/* file dialog styling */
+QFileDialog {
+    background-color: #282a36;
+    color: #f8f8f2;
+}
+
+QFileDialog QListView {
+    background-color: #44475a;
+    color: #f8f8f2;
+    selection-background-color: #6272a4;
+    selection-color: #f8f8f2;
+}
+
+QFileDialog QTreeView {
+    background-color: #44475a;
+    color: #f8f8f2;
+    selection-background-color: #6272a4;
+    selection-color: #f8f8f2;
+}
+
+/* button styling */
+QPushButton {
+    background-color: #6272a4;
+    color: #f8f8f2;
+    border: 1px solid #44475a;
+    padding: 6px 12px;
+    border-radius: 3px;
+    min-width: 60px;
+}
+
+QPushButton:hover {
+    background-color: #bd93f9;
+    color: #282a36;
+}
+
+QPushButton:pressed {
+    background-color: #ff79c6;
+}
+
+QPushButton:default {
+    background-color: #50fa7b;
+    border-color: #8be9fd;
+    color: #282a36;
+}
+
+QPushButton:default:hover {
+    background-color: #8be9fd;
+}
+
+/* line edit styling */
+QLineEdit {
+    background-color: #44475a;
+    color: #f8f8f2;
+    border: 1px solid #6272a4;
+    padding: 4px;
+    border-radius: 3px;
+    selection-background-color: #6272a4;
+    selection-color: #f8f8f2;
+}
+
+QLineEdit:focus {
+    border-color: #bd93f9;
+}
+
+/* combo box styling */
+QComboBox {
+    background-color: #44475a;
+    color: #f8f8f2;
+    border: 1px solid #6272a4;
+    padding: 4px;
+    border-radius: 3px;
+}
+
+QComboBox:hover {
+    border-color: #bd93f9;
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 20px;
+}
+
+QComboBox::down-arrow {
+    image: none;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #f8f8f2;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #44475a;
+    color: #f8f8f2;
+    selection-background-color: #6272a4;
+    selection-color: #f8f8f2;
+    border: 1px solid #6272a4;
+}
+
+/* tab widget styling */
+QTabWidget {
+    background-color: #282a36;
+    border: none;
+}
+
+QTabWidget::pane {
+    background-color: #282a36;
+    border: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+QTabWidget::tab-bar {
+    alignment: left;
+}
+
+/* tab bar styling */
+QTabBar {
+    background-color: #21222c;
+    border: none;
+    outline: none;
+    qproperty-drawBase: 0;
+}
+
+QTabBar::tab {
+    background-color: #21222c;
+    color: #6272a4;
+    padding: 10px 20px;
+    margin: 0px;
+    border: none;
+    min-width: 100px;
+    max-height: 32px;
+}
+
+QTabBar::tab:selected {
+    background-color: #282a36;
+    color: #f8f8f2;
+}
+
+QTabBar::tab:hover:!selected {
+    background-color: #44475a;
+    color: #f8f8f2;
+}
+
+QTabBar::tab:first {
+    margin-left: 0px;
+}
+
+QTabBar::tab:last {
+    margin-right: 0px;
+}
+
+/* close button */
+QTabBar::close-button {
+    background-color: rgba(68, 71, 90, 0.6);
+    border: none;
+    padding: 0px;
+    margin: 0px 6px 0px 8px;
+    width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    subcontrol-position: right;
+}
+
+QTabBar::close-button:hover {
+    background-color: #ff5555;
+    border-radius: 9px;
+}
+
+QTabBar::close-button:pressed {
+    background-color: #ff79c6;
+    border-radius: 9px;
+}
+
+QTabBar::tab:selected QTabBar::close-button {
+    background-color: rgba(98, 114, 164, 0.8);
+}
+
+QTabBar QToolButton {
+    background-color: transparent;
+    border: none;
+    color: #6272a4;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+QTabBar QToolButton:hover {
+    color: #f8f8f2;
+}
+
+/* scroll bar styling */
+QScrollBar:vertical {
+    background-color: #44475a;
+    width: 12px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #6272a4;
+    border-radius: 6px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #bd93f9;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QScrollBar:horizontal {
+    background-color: #44475a;
+    height: 12px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: #6272a4;
+    border-radius: 6px;
+    min-width: 20px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background-color: #bd93f9;
+}
+
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    width: 0px;
+}

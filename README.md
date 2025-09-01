@@ -20,7 +20,8 @@ Built with C++ and Qt, featuring Lua scripting for configuration and plugins
 ## Features
 
 - **Lightweight & Fast** - Minimal resource usage with responsive text editing
-- **Gruvbox Theme** - Beautiful, consistent dark theme for comfortable coding
+- **Multiple Themes** - Choose from Gruvbox, Dracula, and Catppuccin Mocha themes
+- **Theme Switching** - Toggle between themes with `Ctrl+Shift+T` or Tools menu
 - **Syntax Highlighting** - Support for multiple programming languages
 - **Multi-Tab Interface** - Manage multiple files with tabbed interface
 - **Customizable Keybindings** - Configure shortcuts to match your workflow
@@ -29,9 +30,10 @@ Built with C++ and Qt, featuring Lua scripting for configuration and plugins
 
 ### Plugin System
 - **Extensible Architecture** - Lua-based plugin system for unlimited customization
+- **Theme Switcher Plugin** - Easy theme switching with keyboard shortcuts and menu integration
 - **AutoSave Plugin** - Automatic file saving with configurable intervals
 - **AutoFormat Plugin** - Code formatting with external formatters (clang-format, prettier, black, stylua, rustfmt)
-- **Plugin Management** - Easy loading, configuration, and error recovery
+- **Plugin Management** - Easy loading, configuration, error recovery, and dynamic menu updates
 
 > **⚠️ <span style="color:red">IMPORTANT:</span>** The AutoFormat plugin requires external formatting tools to be installed on your system! Run `./scripts/install_formatters.sh` to install all required formatters automatically.
 
@@ -58,10 +60,10 @@ Before building Loom, ensure you have the following installed:
 #### Linux (Ubuntu/Debian) - DEB Package (Recommended)
 ```bash
 # Download the latest DEB package from GitHub releases
-wget https://github.com/dexter-xd/loom/releases/download/beta_1.0.0/loom_1.0.0_amd64.deb
+wget https://github.com/dexter-xd/loom/releases/download/beta_1.1.0/loom_1.1.0_amd64.deb
 
 # Install the package
-sudo dpkg -i loom_1.0.0_amd64.deb
+sudo dpkg -i loom_1.1.0_amd64.deb
 sudo apt-get install -f  # Fix any dependency issues
 
 # Run Loom
@@ -234,6 +236,11 @@ config = {
         highlight_current_line = true
     },
     
+    -- Theme Settings (NEW in v1.1.0)
+    theme = {
+        name = "gruvbox" -- Options: "gruvbox", "dracula", "catppuccin-mocha"
+    },
+    
     -- Window Settings
     window = {
         width = 1224,
@@ -242,7 +249,7 @@ config = {
         remember_position = true
     },
     
-    -- Keybindings
+    -- Keybindings (Enhanced in v1.1.0)
     keybindings = {
         ["Ctrl+S"] = "save_file",
         ["Ctrl+O"] = "open_file",
@@ -251,16 +258,23 @@ config = {
         ["Ctrl+W"] = "close_file",
         ["Ctrl+Q"] = "quit_application",
         ["F11"] = "toggle_fullscreen",
+        ["Ctrl+Shift+T"] = "toggle_theme",    -- Theme switching
+        ["Ctrl+Shift+F"] = "format_document", -- Document formatting
         -- Add your custom keybindings here
     },
     
-    -- Plugin Configuration
+    -- Plugin Configuration (Enhanced in v1.1.0)
     plugins = {
         enabled = true,
         auto_load = true,
         error_recovery = true,
         
         -- Individual plugin settings
+        theme_switcher = {
+            enabled = true,
+            auto_load = true
+        },
+        
         autosave = {
             enabled = false,
             interval = 10, -- seconds
@@ -269,6 +283,7 @@ config = {
         
         autoformat = {
             enabled = true,
+            auto_load = true,
             format_on_save = true,
             use_external_formatters = true
         }
@@ -293,6 +308,44 @@ set_config("editor.font_size", 14)
 Loom features a robust plugin system powered by Lua scripting. Plugins can extend functionality, add new features, and integrate with external tools.
 
 ### Available Plugins
+
+#### Theme Switcher Plugin (`plugins/theme_switcher.lua`) - NEW in v1.1.0
+
+Provides easy theme switching functionality with multiple beautiful themes.
+
+**Features:**
+- Toggle between available themes with `Ctrl+Shift+T`
+- Access via Tools → Toggle Theme menu
+- Supports three themes: Gruvbox, Dracula, and Catppuccin Mocha
+- Automatic theme cycling (wraps around to first theme)
+- Config updates when theme changes
+- Plugin metadata with version tracking
+
+**Available Themes:**
+- **Gruvbox**: Warm, retro groove colors with excellent contrast
+- **Dracula**: Dark theme with vibrant purple and pink accents
+- **Catppuccin Mocha**: Soothing pastel colors on a dark background
+
+**Configuration:**
+```lua
+plugins = {
+    theme_switcher = {
+        enabled = true,     -- Enable/disable theme switcher
+        auto_load = true    -- Load plugin on startup
+    }
+}
+
+-- Set default theme
+theme = {
+    name = "gruvbox"  -- Options: "gruvbox", "dracula", "catppuccin-mocha"
+}
+```
+
+**Usage:**
+- **Keyboard**: Press `Ctrl+Shift+T` to cycle through themes
+- **Menu**: Go to Tools → Toggle Theme
+- **Config**: Set default theme in `config.lua`
+- **Lua Console**: Call `toggle_theme()` or `switch_to_theme("theme_name")`
 
 #### AutoSave Plugin (`plugins/autosave.lua`)
 
@@ -346,6 +399,7 @@ Automatically formats your code using external formatters for consistent code st
 plugins = {
     autoformat = {
         enabled = true,                    -- Enable/disable plugin
+        auto_load = true,                  -- Load plugin on startup
         format_on_save = true,            -- Format when saving files
         use_external_formatters = true    -- Use external tools
     }
@@ -363,9 +417,11 @@ cargo install stylua           # Lua
 ```
 
 **Usage:**
-- Automatic: Enable `format_on_save` in configuration
-- Manual: Call `autoformat.format_document()` from Lua console
-- Status: Use `autoformat.show_status()` to see available formatters
+- **Keyboard**: Press `Ctrl+Shift+F` to format current document
+- **Menu**: Go to Tools → Format Document
+- **Automatic**: Enable `format_on_save` in configuration
+- **Lua Console**: Call `autoformat.format_document()`
+- **Status**: Use `autoformat.show_status()` to see available formatters
 
 ### Plugin Management
 
@@ -433,28 +489,60 @@ _G["my_plugin.on_file_saved"] = my_plugin.on_file_saved
 print("My plugin loaded!")
 ```
 
-## Theming
+## Theming - Enhanced in v1.1.0
 
-Loom uses the beautiful Gruvbox color scheme, providing a comfortable dark theme optimized for long coding sessions.
+Loom now supports multiple beautiful themes that you can switch between easily.
 
-### Gruvbox Color Palette
+### Available Themes
 
-The theme implements the complete Gruvbox palette:
-
+#### Gruvbox (Default)
+A warm, retro groove color scheme providing comfortable dark theme optimized for long coding sessions.
 - **Background**: Dark variants (#282828, #1d2021, #3c3836)
 - **Foreground**: Light variants (#ebdbb2, #fbf1c7, #d5c4a1)
 - **Accents**: Red, Green, Yellow, Blue, Purple, Aqua, Orange
-- **Syntax**: Carefully chosen colors for optimal readability
+
+#### Dracula
+A dark theme with vibrant purple and pink accents, popular among developers.
+- **Background**: Dark purple (#282a36, #44475a)
+- **Foreground**: Light variants (#f8f8f2, #6272a4)
+- **Accents**: Purple, Pink, Green, Orange, Red, Yellow
+
+#### Catppuccin Mocha
+A soothing pastel theme with warm colors on a dark background.
+- **Background**: Dark variants (#1e1e2e, #313244, #45475a)
+- **Foreground**: Light variants (#cdd6f4, #bac2de)
+- **Accents**: Soft pastels in various hues
+
+### Theme Switching
+
+**Change themes instantly without restarting:**
+
+1. **Keyboard Shortcut**: Press `Ctrl+Shift+T` to cycle through themes
+2. **Tools Menu**: Go to Tools → Toggle Theme
+3. **Configuration**: Set default theme in `config.lua`:
+   ```lua
+   theme = {
+       name = "gruvbox"  -- Options: "gruvbox", "dracula", "catppuccin-mocha"
+   }
+   ```
+4. **Lua Console**: Call theme functions directly:
+   ```lua
+   toggle_theme()                    -- Cycle to next theme
+   switch_to_theme("dracula")       -- Switch to specific theme
+   get_current_theme()              -- Get current theme name
+   list_themes()                    -- List available themes
+   ```
 
 ### Theme Customization
 
-The theme is defined in `themes/gruvbox.qss` using Qt stylesheets. You can customize:
+Themes are defined in `themes/*.qss` files using Qt stylesheets. You can customize:
 
-- Color values
+- Color values for any theme
 - Font settings (though fonts are controlled by configuration)
 - UI element styling
 - Tab appearance
 - Scrollbar design
+- Syntax highlighting colors
 
 ## Keybindings
 
@@ -479,6 +567,8 @@ The theme is defined in `themes/gruvbox.qss` using Qt stylesheets. You can custo
 | `F11` | Toggle fullscreen |
 | `Ctrl+L` | Set language |
 | `Ctrl+Shift+L` | Redetect language |
+| `Ctrl+Shift+T` | Toggle theme |
+| `Ctrl+Shift+F` | Format document |
 
 ### Custom Keybindings
 
@@ -486,9 +576,10 @@ Add custom keybindings in `config/config.lua`:
 
 ```lua
 keybindings = {
-    ["Ctrl+Shift+F"] = "format_document",
-    ["Ctrl+/"] = "toggle_comment",
-    ["Ctrl+D"] = "duplicate_line",
+    ["Ctrl+Shift+T"] = "toggle_theme",     -- Theme switching
+    ["Ctrl+Shift+F"] = "format_document",  -- Document formatting
+    ["Ctrl+/"] = "toggle_comment",         -- Comment toggling
+    ["Ctrl+D"] = "duplicate_line",         -- Line duplication
     -- Add your custom bindings here
 }
 ```

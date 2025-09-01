@@ -13,6 +13,11 @@ config = {
         highlight_current_line = true
     },
     
+    -- theme settings
+    theme = {
+        name = "gruvbox", -- available: "gruvbox", "dracula", "catppuccin-mocha"
+    },
+    
     
     -- keybinding configuration
     keybindings = {
@@ -32,7 +37,9 @@ config = {
         ["Ctrl+H"] = "replace",
         ["F11"] = "toggle_fullscreen",
         ["Ctrl+L"] = "set_language",
-        ["Ctrl+Shift+L"] = "redetect_language"
+        ["Ctrl+Shift+L"] = "redetect_language",
+        ["Ctrl+Shift+T"] = "toggle_theme",
+        ["Ctrl+Shift+F"] = "format_document"
     },
     
     -- window settings
@@ -60,8 +67,13 @@ config = {
         
         autoformat = {
             enabled = true,
+            auto_load = true,
             format_on_save = true,  -- enable format on save
             use_external_formatters = true 
+        },
+        theme_switcher = {
+            enabled = true,
+            auto_load = true
         },
     }
 }

@@ -135,8 +135,12 @@ void LuaBridge::registerEditorAPI()
 
     registerFunction("create_timer", lua_createTimer);
     registerFunction("stop_timer", lua_stopTimer);
-    
+
     registerFunction("debug_log", lua_debugLog);
+
+    registerFunction("set_theme", lua_setTheme);
+    registerFunction("get_theme", lua_getTheme);
+    registerFunction("toggle_theme", lua_toggleTheme);
 
     lua_newtable(m_lua);
     lua_pushcfunction(m_lua, lua_registerEventHandler);
@@ -904,13 +908,72 @@ int LuaBridge::lua_debugLog(lua_State *L)
     const char *message = luaL_checkstring(L, 1);
     if (message) {
 #ifdef NDEBUG
-        // Release build - no debug logs from Lua
-        (void)message; // Suppress unused variable warning
+
+        (void)message; 
 #else
-        // Debug build - show Lua debug logs
+
         DEBUG_LOG_LUA(message);
 #endif
     }
+
+    return 0;
+}
+
+int LuaBridge::lua_setTheme(lua_State *L)
+{
+    if (!g_bridge) {
+        lua_pushstring(L, "No bridge available");
+        lua_error(L);
+        return 0;
+    }
+
+    if (lua_gettop(L) != 1) {
+        lua_pushstring(L, "set_theme expects 1 argument: theme_name");
+        lua_error(L);
+        return 0;
+    }
+
+    if (!lua_isstring(L, 1)) {
+        lua_pushstring(L, "set_theme expects string argument");
+        lua_error(L);
+        return 0;
+    }
+
+    QString themeName = lua_tostring(L, 1);
+    emit g_bridge->themeChangeRequested(themeName);
+
+    return 0;
+}
+
+int LuaBridge::lua_getTheme(lua_State *L)
+{
+    if (!g_bridge) {
+        lua_pushstring(L, "gruvbox"); 
+        return 1;
+    }
+
+    QString currentTheme = g_bridge->getConfigString("theme.name", "gruvbox");
+    lua_pushstring(L, currentTheme.toUtf8().constData());
+
+    return 1;
+}
+
+int LuaBridge::lua_toggleTheme(lua_State *L)
+{
+    if (!g_bridge) {
+        return 0;
+    }
+
+    bool pluginEnabled = g_bridge->getConfigBool("plugins.theme_switcher.enabled", false);
+    bool autoLoad = g_bridge->getConfigBool("plugins.theme_switcher.auto_load", false);
+
+    if (!pluginEnabled || !autoLoad) {
+
+        g_bridge->executeString("editor.set_status_text('Theme switcher plugin is disabled')");
+        return 0;
+    }
+
+    g_bridge->executeString("toggle_theme()");
 
     return 0;
 }

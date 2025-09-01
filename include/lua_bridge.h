@@ -72,6 +72,7 @@ signals:
     void textChangeRequested(const QString &content);
     void cursorMoveRequested(int line, int column);
     void statusMessageRequested(const QString &message);
+    void themeChangeRequested(const QString &themeName);
 
 private:
     lua_State *m_lua;
@@ -116,6 +117,10 @@ private:
     static int lua_listPlugins(lua_State *L);
     static int lua_isPluginLoaded(lua_State *L);
     static int lua_getPluginConfig(lua_State *L);
+    
+    static int lua_setTheme(lua_State *L);
+    static int lua_getTheme(lua_State *L);
+    static int lua_toggleTheme(lua_State *L);
 };
 
 #endif 
