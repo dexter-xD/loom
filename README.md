@@ -238,11 +238,11 @@ config = {
         highlight_current_line = true
     },
     
-    -- Theme Settings (NEW in v1.1.0)
+    -- Theme Settings
     theme = {
         name = "gruvbox" -- Options: "gruvbox", "dracula", "catppuccin-mocha"
     },
-    
+
     -- Window Settings
     window = {
         width = 1224,
@@ -250,8 +250,8 @@ config = {
         remember_size = true,
         remember_position = true
     },
-    
-    -- Keybindings (Enhanced in v1.1.0)
+
+    -- Keybindings
     keybindings = {
         ["Ctrl+S"] = "save_file",
         ["Ctrl+O"] = "open_file",
@@ -265,8 +265,8 @@ config = {
         ["Ctrl+Shift+F"] = "format_document", -- Document formatting
         -- Add your custom keybindings here
     },
-    
-    -- Plugin Configuration (Enhanced in v1.1.0)
+
+    -- Plugin Configuration
     plugins = {
         enabled = true,
         auto_load = true,
@@ -312,7 +312,7 @@ Loom features a robust plugin system powered by Lua scripting. Plugins can exten
 
 ### Available Plugins
 
-#### Theme Switcher Plugin (`plugins/theme_switcher.lua`) - NEW in v1.1.0
+#### Theme Switcher Plugin (`plugins/theme_switcher.lua`)
 
 Provides easy theme switching functionality with multiple beautiful themes.
 
@@ -492,7 +492,7 @@ _G["my_plugin.on_file_saved"] = my_plugin.on_file_saved
 print("My plugin loaded!")
 ```
 
-## Theming - Enhanced in v1.1.0
+## Theming
 
 Loom now supports multiple beautiful themes that you can switch between easily.
 
