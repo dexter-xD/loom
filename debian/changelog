@@ -1,3 +1,25 @@
+loom (1.2.1-1) unstable; urgency=medium
+
+  * Major update with file tree viewer and project navigation
+  * NEW: File tree viewer with collapsible directory navigation
+  * NEW: Project directory support - open entire projects with ./loom project-folder
+  * NEW: File tree panel with F12 toggle shortcut
+  * NEW: Context menu for file operations (new file, new folder, rename, delete)
+  * NEW: Single-click file opening from file tree
+  * NEW: File tree theme integration with current theme colors
+  * NEW: File tree widget with modern scrollbar design
+  * ENHANCED: Project opening functionality with directory validation
+  * ENHANCED: Editor window layout with file tree panel integration
+  * ENHANCED: Keyboard shortcuts including F12 for file tree toggle
+  * ENHANCED: Configuration system with file tree toggle keybinding
+  * FIXED: Scrollbar hover functionality replaced with always-visible design
+  * FIXED: CSS template argument mismatch errors
+  * IMPROVED: File tree navigation with expand/collapse functionality
+  * IMPROVED: File tree UI with header, buttons, and modern styling
+  * IMPROVED: Documentation updated with file tree features and shortcuts
+
+ -- dexter-xd <dexter-xd@users.noreply.github.com>  Wed, 04 Sep 2025 08:00:00 +0530
+
 loom (1.1.0-1) unstable; urgency=medium
 
   * Major update with theme switching and enhanced plugin system
@@ -34,4 +56,4 @@ loom (1.0.0-1) unstable; urgency=medium
   * Find & Replace functionality
   * Cross-platform compatibility
 
- -- dexter-xd <dexter-xd@users.noreply.github.com>  Mon, 01 Sep 2025 
+ -- dexter-xd <dexter-xd@users.noreply.github.com>  Mon, 01 Sep 2025

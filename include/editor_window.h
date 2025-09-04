@@ -26,11 +26,13 @@
 #include <QPushButton>
 #include <QTimer>
 #include <QKeyEvent>
+#include <QSplitter>
 #include "buffer.h"
 #include "lua_bridge.h"
 #include "syntax_highlighter.h"
 #include "plugin_manager.h"
 #include "code_editor.h"
+#include "file_tree_widget.h"
 
 class EditorWindow : public QMainWindow
 {
@@ -41,6 +43,7 @@ public:
     ~EditorWindow();
 
     void openFile(const QString &filePath);
+    void openProject(const QString &projectPath);
     void saveFile();
     void saveFileAs();
     void newFile();
@@ -86,6 +89,9 @@ private slots:
     void onLuaStatusMessageRequested(const QString &message);
     void onLuaThemeChangeRequested(const QString &themeName);
 
+    void onFileTreeFileOpenRequested(const QString &filePath);
+    void onFileTreeVisibilityChanged(bool visible);
+
     void executeAction(const QString &action);
     bool isPluginActionEnabled(const QString &pluginName) const;
 
@@ -105,6 +111,10 @@ private:
     PluginManager *m_pluginManager;
 
     QMap<QString, QShortcut*> m_shortcuts;
+
+    // File tree widget
+    QSplitter *m_mainSplitter;
+    FileTreeWidget *m_fileTreeWidget;
 
     void setupUI();
     void setupMenus();
@@ -140,4 +150,4 @@ private:
     void updateEditorThemeColors(const QString &themeName);
 };
 
-#endif 
+#endif

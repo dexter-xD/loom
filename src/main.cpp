@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     parser.addVersionOption();
 
-    parser.addPositionalArgument("file", "File to open on startup", "[file]");
+    parser.addPositionalArgument("path", "File or project directory to open on startup", "[file|directory]");
 
     try {
         parser.process(app);
@@ -48,17 +48,21 @@ int main(int argc, char *argv[])
 
     const QStringList args = parser.positionalArguments();
     if (!args.isEmpty()) {
-        const QString filePath = args.first();
-        if (QFile::exists(filePath)) {
-            window.openFile(filePath);
+        const QString path = args.first();
+        QFileInfo pathInfo(path);
+        
+        if (pathInfo.exists()) {
+            if (pathInfo.isFile()) {
+                window.openFile(path);
+            } else if (pathInfo.isDir()) {
+                window.openProject(path);
+            }
         } else {
-            QMessageBox::warning(&window, "File Not Found", 
-                               QString("Could not find file: %1").arg(filePath));
-
+            QMessageBox::warning(&window, "Path Not Found", 
+                               QString("Could not find file or directory: %1").arg(path));
             window.ensureAtLeastOneTab();
         }
     } else {
-
         window.ensureAtLeastOneTab();
     }
 

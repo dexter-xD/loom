@@ -25,6 +25,8 @@ Description: A fast, minimal, and customizable text editor
   * Theme Switching - Toggle between themes with Ctrl+Shift+T or Tools menu
   * Syntax Highlighting - Support for multiple programming languages
   * Multi-Tab Interface - Manage multiple files with tabbed interface
+  * File Tree Viewer - Navigate project directories with collapsible file tree
+  * Project Support - Open entire project directories and navigate files easily
   * Customizable Keybindings - Configure shortcuts to match your workflow
   * Line Numbers - Optional line number display with relative numbering
   * Find & Replace - Built-in search and replace functionality

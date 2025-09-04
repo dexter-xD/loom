@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # project configuration
-project(loom VERSION 1.1.0 LANGUAGES CXX)
+project(loom VERSION 1.2.1 LANGUAGES CXX)
 
 # set c++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -37,6 +37,7 @@ set(SOURCES
     src/plugin_manager.cpp
     src/code_editor.cpp
     src/line_number_area.cpp
+    src/file_tree_widget.cpp
 )
 
 # header files (needed for MOC processing)
@@ -49,6 +50,7 @@ set(HEADERS
     include/plugin_manager.h
     include/code_editor.h
     include/line_number_area.h
+    include/file_tree_widget.h
 )
 
 include_directories(include)

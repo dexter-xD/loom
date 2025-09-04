@@ -89,14 +89,41 @@ EditorWindow::~EditorWindow()
 void EditorWindow::setupUI()
 {
 
-    m_tabWidget = new QTabWidget(this);
-    setCentralWidget(m_tabWidget);
+    m_mainSplitter = new QSplitter(Qt::Horizontal, this);
+    setCentralWidget(m_mainSplitter);
 
+    m_fileTreeWidget = new FileTreeWidget(this);
+    m_fileTreeWidget->setVisible(false); 
+
+    m_tabWidget = new QTabWidget(this);
     m_tabWidget->setTabsClosable(true);
     m_tabWidget->setMovable(true);
     m_tabWidget->setDocumentMode(true);
-
     m_tabWidget->setTabBarAutoHide(false);
+
+    m_mainSplitter->addWidget(m_fileTreeWidget);
+    m_mainSplitter->addWidget(m_tabWidget);
+
+    m_mainSplitter->setStretchFactor(0, 0); 
+    m_mainSplitter->setStretchFactor(1, 1); 
+    m_mainSplitter->setSizes({200, 800}); 
+
+    QColor lineNumberBg = QColor(40, 37, 34).darker(110);  
+    QString handleStyle = QString(
+        "QSplitter::handle {"
+        "    background-color: %1;"  
+        "    border: none;"
+        "    margin: 0px;"
+        "    padding: 0px;"
+        "    width: 1px;"  
+        "}"
+        "QSplitter::handle:hover {"
+        "    background-color: %2;"  
+        "}"
+    ).arg(lineNumberBg.name(), lineNumberBg.lighter(120).name());
+
+    m_mainSplitter->setStyleSheet(handleStyle);
+    m_mainSplitter->setHandleWidth(1);  
 }
 
 void EditorWindow::setupMenus()
@@ -234,6 +261,27 @@ void EditorWindow::setupMenus()
 
     viewMenu->addSeparator();
 
+    QAction *toggleFileTreeAction = new QAction("Toggle &File Tree", this);
+    toggleFileTreeAction->setStatusTip("Toggle file tree visibility (F12)");
+    connect(toggleFileTreeAction, &QAction::triggered, [this]() {
+        if (m_fileTreeWidget) {
+            bool wasVisible = m_fileTreeWidget->isVisible();
+            m_fileTreeWidget->toggleVisibility();
+            bool nowVisible = m_fileTreeWidget->isVisible();
+
+            if (wasVisible != nowVisible) {
+                m_statusBar->showMessage(nowVisible ? "File tree shown" : "File tree hidden", 2000);
+            } else if (!m_fileTreeWidget->rootPath().isEmpty()) {
+                m_statusBar->showMessage("File tree toggled", 2000);
+            } else {
+                m_statusBar->showMessage("No project open - open a project folder first", 3000);
+            }
+        }
+    });
+    viewMenu->addAction(toggleFileTreeAction);
+
+    viewMenu->addSeparator();
+
     QMenu *languageMenu = viewMenu->addMenu("Syntax &Language");
 
     QStringList languages = {"text", "cpp", "python", "javascript", "lua", "java", "json", "xml", "html", "css", "markdown"};
@@ -356,6 +404,13 @@ void EditorWindow::connectSignals()
     connect(m_tabWidget, &QTabWidget::tabCloseRequested,
             this, &EditorWindow::onTabCloseRequested);
 
+    if (m_fileTreeWidget) {
+        connect(m_fileTreeWidget, &FileTreeWidget::fileOpenRequested,
+                this, &EditorWindow::onFileTreeFileOpenRequested);
+        connect(m_fileTreeWidget, &FileTreeWidget::visibilityChanged,
+                this, &EditorWindow::onFileTreeVisibilityChanged);
+    }
+
     if (m_luaBridge) {
         connect(m_luaBridge, &LuaBridge::fileOpenRequested,
                 this, &EditorWindow::onLuaFileOpenRequested);
@@ -369,6 +424,27 @@ void EditorWindow::connectSignals()
                 this, &EditorWindow::onLuaStatusMessageRequested);
         connect(m_luaBridge, &LuaBridge::themeChangeRequested,
                 this, &EditorWindow::onLuaThemeChangeRequested);
+    }
+}
+
+void EditorWindow::openProject(const QString &projectPath)
+{
+    QDir projectDir(projectPath);
+    if (!projectDir.exists()) {
+        QMessageBox::warning(this, "Project Not Found",
+                           QString("Project directory '%1' does not exist.").arg(projectPath));
+        return;
+    }
+
+    if (m_fileTreeWidget) {
+        m_fileTreeWidget->setRootPath(projectPath);
+        m_fileTreeWidget->setVisible(true); 
+
+        QString projectName = projectDir.dirName();
+        setWindowTitle(QString("Loom - %1").arg(projectName));
+
+        m_statusBar->showMessage(QString("Opened project: %1").arg(projectName), 3000);
+        DEBUG_LOG_EDITOR("Opened project:" << projectPath);
     }
 }
 
@@ -711,8 +787,7 @@ void EditorWindow::loadConfiguration()
     if (!QFile::exists(configPath)) {
         configPath = "config/config.lua";
     }
-    
-    // Check system installation path for DEB package
+
     if (!QFile::exists(configPath)) {
         configPath = "/usr/share/loom/config/config.lua";
     }
@@ -743,7 +818,7 @@ void EditorWindow::loadPlugins()
     if (!QDir(pluginDir).exists()) {
         pluginDir = "plugins";
     }
-    
+
     if (!QDir(pluginDir).exists()) {
         pluginDir = "/usr/share/loom/plugins";
     }
@@ -913,6 +988,7 @@ void EditorWindow::onLuaStatusMessageRequested(const QString &message)
 void EditorWindow::setupKeybindings()
 {
     if (!m_luaBridge) {
+        DEBUG_LOG_EDITOR("setupKeybindings: m_luaBridge is null");
         return;
     }
 
@@ -923,19 +999,30 @@ void EditorWindow::setupKeybindings()
 
     QMap<QString, QString> keybindings = m_luaBridge->getKeybindings();
 
+    DEBUG_LOG_EDITOR("Loading keybindings from config:");
     for (auto it = keybindings.begin(); it != keybindings.end(); ++it) {
         const QString &keySequence = it.key();
         const QString &action = it.value();
 
-        QShortcut *shortcut = new QShortcut(QKeySequence(keySequence), this);
+        DEBUG_LOG_EDITOR("Found keybinding:" << keySequence << "->" << action);
 
-        connect(shortcut, &QShortcut::activated, [this, action]() {
+        QShortcut *shortcut = new QShortcut(QKeySequence(keySequence), this);
+        shortcut->setContext(Qt::ApplicationShortcut); 
+
+        connect(shortcut, &QShortcut::activated, [this, action, keySequence]() {
+            DEBUG_LOG_EDITOR("Shortcut activated:" << keySequence << "->" << action);
             executeAction(action);
         });
 
         m_shortcuts[keySequence] = shortcut;
 
         DEBUG_LOG_EDITOR("✓ Registered keybinding:" << keySequence << "->" << action);
+    }
+
+    if (keybindings.contains("F12")) {
+        DEBUG_LOG_EDITOR("✓ toggle_file_tree shortcut found in keybindings");
+    } else {
+        DEBUG_LOG_EDITOR("✗ toggle_file_tree shortcut NOT found in keybindings");
     }
 
 }
@@ -1023,6 +1110,24 @@ void EditorWindow::executeAction(const QString &action)
             }
         } else {
             m_statusBar->showMessage("Auto-formatter plugin is disabled", 2000);
+        }
+    } else if (action == "toggle_file_tree") {
+        DEBUG_LOG_EDITOR("Toggle file tree action triggered");
+        if (m_fileTreeWidget) {
+            bool wasVisible = m_fileTreeWidget->isVisible();
+            m_fileTreeWidget->toggleVisibility();
+            bool nowVisible = m_fileTreeWidget->isVisible();
+
+            if (wasVisible != nowVisible) {
+                m_statusBar->showMessage(nowVisible ? "File tree shown" : "File tree hidden", 2000);
+            } else if (!m_fileTreeWidget->rootPath().isEmpty()) {
+                m_statusBar->showMessage("File tree toggled", 2000);
+            } else {
+                m_statusBar->showMessage("No project open - open a project folder first", 3000);
+            }
+        } else {
+            DEBUG_LOG_EDITOR("File tree widget is null");
+            m_statusBar->showMessage("File tree not available", 2000);
         }
     } else {
         DEBUG_LOG_EDITOR("Unknown action:" << action);
@@ -1688,29 +1793,45 @@ void EditorWindow::onLuaThemeChangeRequested(const QString &themeName)
     loadTheme(themeName);
 }
 
+void EditorWindow::onFileTreeFileOpenRequested(const QString &filePath)
+{
+    DEBUG_LOG_EDITOR("File tree requested to open file:" << filePath);
+    openFile(filePath);
+}
+
+void EditorWindow::onFileTreeVisibilityChanged(bool visible)
+{
+    DEBUG_LOG_EDITOR("File tree visibility changed:" << visible);
+    m_statusBar->showMessage(visible ? "File tree shown" : "File tree hidden", 2000);
+}
+
 void EditorWindow::updateEditorThemeColors(const QString &themeName)
 {
 
     QColor background, currentLine, normalLine;
 
     if (themeName == "gruvbox") {
-        background = QColor(40, 37, 34);        
-        currentLine = QColor(251, 241, 199);    
-        normalLine = QColor(146, 131, 116);     
+        background = QColor(40, 37, 34);
+        currentLine = QColor(251, 241, 199);
+        normalLine = QColor(146, 131, 116);
     } else if (themeName == "dracula") {
-        background = QColor(33, 34, 44);        
-        currentLine = QColor(248, 248, 242);    
-        normalLine = QColor(98, 114, 164);      
+        background = QColor(33, 34, 44);
+        currentLine = QColor(248, 248, 242);
+        normalLine = QColor(98, 114, 164);
     } else if (themeName == "catppuccin-mocha") {
-        background = QColor(24, 24, 37);        
-        currentLine = QColor(205, 214, 244);    
-        normalLine = QColor(166, 173, 200);     
+        background = QColor(24, 24, 37);
+        currentLine = QColor(205, 214, 244);
+        normalLine = QColor(166, 173, 200);
     } else {
 
         for (CodeEditor* editor : m_textEditors) {
             if (editor) {
                 editor->updateThemeColors();
             }
+        }
+
+        if (m_fileTreeWidget) {
+            m_fileTreeWidget->updateThemeColors();
         }
         return;
     }
@@ -1720,4 +1841,28 @@ void EditorWindow::updateEditorThemeColors(const QString &themeName)
             editor->setThemeColors(background, currentLine, normalLine);
         }
     }
+
+    if (m_fileTreeWidget) {
+        QColor fileTreeBackground = background.darker(105); 
+        QColor fileTreeText = normalLine; 
+        QColor fileTreeHighlight = currentLine; 
+
+        m_fileTreeWidget->setThemeColors(fileTreeBackground, fileTreeText, fileTreeHighlight);
+    }
+
+    QColor lineNumberBg = background.darker(110);  
+    QString handleStyle = QString(
+        "QSplitter::handle {"
+        "    background-color: %1;"  
+        "    border: none;"
+        "    margin: 0px;"
+        "    padding: 0px;"
+        "    width: 1px;"  
+        "}"
+        "QSplitter::handle:hover {"
+        "    background-color: %2;"  
+        "}"
+    ).arg(lineNumberBg.name(), lineNumberBg.lighter(120).name());
+
+    m_mainSplitter->setStyleSheet(handleStyle);
 }

@@ -39,7 +39,8 @@ config = {
         ["Ctrl+L"] = "set_language",
         ["Ctrl+Shift+L"] = "redetect_language",
         ["Ctrl+Shift+T"] = "toggle_theme",
-        ["Ctrl+Shift+F"] = "format_document"
+        ["Ctrl+Shift+F"] = "format_document",
+        ["F12"] = "toggle_file_tree"
     },
     
     -- window settings

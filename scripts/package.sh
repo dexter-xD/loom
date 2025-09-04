@@ -5,7 +5,7 @@
 
 set -e
 
-VERSION="1.1.0"
+VERSION="1.2.1"
 PACKAGE_NAME="loom"
 PACKAGE_FILE="${PACKAGE_NAME}_${VERSION}_amd64.deb"
 
@@ -177,7 +177,7 @@ else
     exit 1
 fi
 
-if echo "$PACKAGE_INFO" | grep -q "Version: 1.1.0"; then
+if echo "$PACKAGE_INFO" | grep -q "Version: 1.2.1"; then
     echo "    ✅ Package version correct"
 else
     echo "    ❌ Package version incorrect"

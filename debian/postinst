@@ -19,10 +19,15 @@ case "$1" in
             update-mime-database /usr/share/mime || true
         fi
         
-        echo "Loom text editor v1.1.0 installed successfully!"
+        echo "Loom text editor v1.2.1 installed successfully!"
         echo "Run 'loom' to start the editor."
         echo ""
-        echo "New in v1.1.0:"
+        echo "New in v1.2.1:"
+        echo "  • File tree viewer with collapsible directory navigation"
+        echo "  • Project support: Open entire projects with ./loom project-folder"
+        echo "  • File tree panel with F12 toggle shortcut"
+        echo "  • Context menu for file operations (new, rename, delete)"
+        echo "  • Single-click file opening from file tree"
         echo "  • Multiple themes: Gruvbox, Dracula, Catppuccin Mocha"
         echo "  • Theme switching: Press Ctrl+Shift+T or use Tools menu"
         echo "  • Enhanced plugin system with dynamic menus"

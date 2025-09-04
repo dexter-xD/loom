@@ -39,10 +39,10 @@ int CodeEditor::lineNumberAreaWidth()
     return space;
 }
 
-void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */)
+void CodeEditor::updateLineNumberAreaWidth(int )
 {
     if (m_lineNumbersVisible) {
-        setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
+        setViewportMargins(lineNumberAreaWidth() + 6, 0, 0, 0);  
     } else {
         setViewportMargins(0, 0, 0, 0);
     }
@@ -94,32 +94,31 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     }
 
     QPainter painter(lineNumberArea);
-    painter.fillRect(event->rect(), m_lineNumberBackground);
 
     QTextBlock block = firstVisibleBlock();
     int blockNumber = block.blockNumber();
     int top = qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
     int bottom = top + qRound(blockBoundingRect(block).height());
-    
+
     int currentLine = textCursor().blockNumber();
 
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
             QString number;
-            
+
             if (m_relativeLineNumbers && blockNumber != currentLine) {
                 int distance = qAbs(blockNumber - currentLine);
                 number = QString::number(distance);
             } else {
                 number = QString::number(blockNumber + 1);
             }
-            
+
             if (blockNumber == currentLine) {
                 painter.setPen(m_lineNumberCurrentLine);
             } else {
                 painter.setPen(m_lineNumberNormal);
             }
-            
+
             painter.drawText(0, top, lineNumberArea->width() - 5, fontMetrics().height(),
                            Qt::AlignRight, number);
         }
@@ -155,7 +154,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *event)
         QTextCursor cursor = textCursor();
         QTextBlock currentBlock = cursor.block();
         QString currentLine = currentBlock.text();
-        
+
         int indentLevel = 0;
         for (QChar ch : currentLine) {
             if (ch == ' ') {
@@ -166,9 +165,9 @@ void CodeEditor::keyPressEvent(QKeyEvent *event)
                 break;
             }
         }
-        
+
         QPlainTextEdit::keyPressEvent(event);
-        
+
         QString indentString = QString(indentLevel, ' ');
         insertPlainText(indentString);
     } else {
@@ -181,7 +180,7 @@ void CodeEditor::setThemeColors(const QColor &background, const QColor &currentL
     m_lineNumberBackground = background;
     m_lineNumberCurrentLine = currentLine;
     m_lineNumberNormal = normalLine;
-    
+
     if (lineNumberArea) {
         lineNumberArea->update();
     }
@@ -189,16 +188,16 @@ void CodeEditor::setThemeColors(const QColor &background, const QColor &currentL
 
 void CodeEditor::updateThemeColors()
 {
-    
+
     QPalette palette = this->palette();
     QColor baseColor = palette.color(QPalette::Base);
     QColor textColor = palette.color(QPalette::Text);
-    
+
     m_lineNumberBackground = baseColor.darker(110);
-    
+
     m_lineNumberCurrentLine = textColor;
     m_lineNumberNormal = textColor.darker(150);
-    
+
     if (lineNumberArea) {
         lineNumberArea->update();
     }

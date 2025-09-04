@@ -24,6 +24,8 @@ Built with C++ and Qt, featuring Lua scripting for configuration and plugins
 - **Theme Switching** - Toggle between themes with `Ctrl+Shift+T` or Tools menu
 - **Syntax Highlighting** - Support for multiple programming languages
 - **Multi-Tab Interface** - Manage multiple files with tabbed interface
+- **File Tree Viewer** - Navigate project directories with a collapsible file tree panel
+- **Project Support** - Open entire project directories and navigate files easily
 - **Customizable Keybindings** - Configure shortcuts to match your workflow
 - **Line Numbers** - Optional line number display with relative numbering
 - **Find & Replace** - Built-in search and replace functionality
@@ -258,6 +260,7 @@ config = {
         ["Ctrl+W"] = "close_file",
         ["Ctrl+Q"] = "quit_application",
         ["F11"] = "toggle_fullscreen",
+        ["F12"] = "toggle_file_tree",         -- File tree panel toggle
         ["Ctrl+Shift+T"] = "toggle_theme",    -- Theme switching
         ["Ctrl+Shift+F"] = "format_document", -- Document formatting
         -- Add your custom keybindings here
@@ -565,6 +568,7 @@ Themes are defined in `themes/*.qss` files using Qt stylesheets. You can customi
 | `Ctrl+F` | Find |
 | `Ctrl+H` | Replace |
 | `F11` | Toggle fullscreen |
+| `F12` | Toggle file tree |
 | `Ctrl+L` | Set language |
 | `Ctrl+Shift+L` | Redetect language |
 | `Ctrl+Shift+T` | Toggle theme |
