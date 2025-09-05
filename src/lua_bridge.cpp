@@ -1,5 +1,5 @@
 #include "lua_bridge.h"
-#include "syntax_highlighter.h"
+#include "tree_sitter_highlighter.h"
 #include "plugin_manager.h"
 #include "debug_log.h"
 #include <QDir>
@@ -558,12 +558,12 @@ QMap<QString, QString> LuaBridge::getKeybindings()
     lua_gettable(m_lua, -2);
 
     if (!lua_istable(m_lua, -1)) {
-        lua_pop(m_lua, 2); 
+        lua_pop(m_lua, 2);
         DEBUG_LOG_LUA("Keybindings table not found in configuration");
         return keybindings;
     }
 
-    lua_pushnil(m_lua); 
+    lua_pushnil(m_lua);
     int count = 0;
     while (lua_next(m_lua, -2) != 0) {
         count++;
@@ -573,12 +573,129 @@ QMap<QString, QString> LuaBridge::getKeybindings()
             QString action = QString::fromUtf8(lua_tostring(m_lua, -1));
             keybindings[key] = action;
         }
-        lua_pop(m_lua, 1); 
+        lua_pop(m_lua, 1);
     }
 
-    lua_pop(m_lua, 2); 
+    lua_pop(m_lua, 2);
 
     return keybindings;
+}
+
+QMap<QString, QString> LuaBridge::getSyntaxColors()
+{
+    QMap<QString, QString> syntaxColors;
+
+    if (!m_lua) {
+        return syntaxColors;
+    }
+
+    lua_getglobal(m_lua, "config");
+    if (!lua_istable(m_lua, -1)) {
+        lua_pop(m_lua, 1);
+        DEBUG_LOG_LUA("Config table not found for syntax colors");
+        return syntaxColors;
+    }
+
+    lua_pushstring(m_lua, "syntax");
+    lua_gettable(m_lua, -2);
+
+    if (!lua_istable(m_lua, -1)) {
+        lua_pop(m_lua, 2);
+        DEBUG_LOG_LUA("Syntax colors table not found in configuration");
+        return syntaxColors;
+    }
+
+    lua_pushnil(m_lua);
+    while (lua_next(m_lua, -2) != 0) {
+        if (lua_isstring(m_lua, -2) && lua_isstring(m_lua, -1)) {
+            QString key = QString::fromUtf8(lua_tostring(m_lua, -2));
+            QString color = QString::fromUtf8(lua_tostring(m_lua, -1));
+            syntaxColors[key] = color;
+        }
+        lua_pop(m_lua, 1);
+    }
+
+    lua_pop(m_lua, 2);
+
+    return syntaxColors;
+}
+
+QMap<QString, QString> LuaBridge::getMarkdownSyntaxColors()
+{
+    QMap<QString, QString> markdownSyntaxColors;
+
+    if (!m_lua) {
+        return markdownSyntaxColors;
+    }
+
+    lua_getglobal(m_lua, "config");
+    if (!lua_istable(m_lua, -1)) {
+        lua_pop(m_lua, 1);
+        DEBUG_LOG_LUA("Config table not found for markdown syntax colors");
+        return markdownSyntaxColors;
+    }
+
+    lua_pushstring(m_lua, "markdown_syntax");
+    lua_gettable(m_lua, -2);
+
+    if (!lua_istable(m_lua, -1)) {
+        lua_pop(m_lua, 2);
+        DEBUG_LOG_LUA("Markdown syntax colors table not found in configuration");
+        return markdownSyntaxColors;
+    }
+
+    lua_pushnil(m_lua);
+    while (lua_next(m_lua, -2) != 0) {
+        if (lua_isstring(m_lua, -2) && lua_isstring(m_lua, -1)) {
+            QString key = QString::fromUtf8(lua_tostring(m_lua, -2));
+            QString color = QString::fromUtf8(lua_tostring(m_lua, -1));
+            markdownSyntaxColors[key] = color;
+        }
+        lua_pop(m_lua, 1);
+    }
+
+    lua_pop(m_lua, 2);
+
+    return markdownSyntaxColors;
+}
+
+QMap<QString, QString> LuaBridge::getBasicHighlighterColors()
+{
+    QMap<QString, QString> basicHighlighterColors;
+
+    if (!m_lua) {
+        return basicHighlighterColors;
+    }
+
+    lua_getglobal(m_lua, "config");
+    if (!lua_istable(m_lua, -1)) {
+        lua_pop(m_lua, 1);
+        DEBUG_LOG_LUA("Config table not found for basic highlighter colors");
+        return basicHighlighterColors;
+    }
+
+    lua_pushstring(m_lua, "basic_highlighter");
+    lua_gettable(m_lua, -2);
+
+    if (!lua_istable(m_lua, -1)) {
+        lua_pop(m_lua, 2);
+        DEBUG_LOG_LUA("Basic highlighter colors table not found in configuration");
+        return basicHighlighterColors;
+    }
+
+    lua_pushnil(m_lua);
+    while (lua_next(m_lua, -2) != 0) {
+        if (lua_isstring(m_lua, -2) && lua_isstring(m_lua, -1)) {
+            QString key = QString::fromUtf8(lua_tostring(m_lua, -2));
+            QString color = QString::fromUtf8(lua_tostring(m_lua, -1));
+            basicHighlighterColors[key] = color;
+        }
+        lua_pop(m_lua, 1);
+    }
+
+    lua_pop(m_lua, 2);
+
+    return basicHighlighterColors;
 }
 
 void LuaBridge::setEditorText(const QString &text)
@@ -630,7 +747,7 @@ bool LuaBridge::executeFile(const QString &filePath)
     return true;
 }
 
-void LuaBridge::setSyntaxHighlighter(SyntaxHighlighter *highlighter)
+void LuaBridge::setSyntaxHighlighter(TreeSitterHighlighter *highlighter)
 {
     m_syntaxHighlighter = highlighter;
 

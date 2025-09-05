@@ -1,3 +1,22 @@
+loom (1.2.2-1) unstable; urgency=medium
+
+  * Beta release with syntax highlighting fixes and improvements
+  * NEW: Enhanced Tree-sitter syntax highlighting system
+  * NEW: Dual highlighting system - Tree-sitter + Basic Qt highlighters
+  * NEW: Comprehensive syntax highlighting for programming languages
+  * NEW: Tree-sitter dependency download script for development setup
+  * NEW: Removed git submodules in favor of manual dependency management
+  * ENHANCED: Syntax highlighting configuration with customizable colors
+  * ENHANCED: Basic highlighter for HTML, CSS, JSON, and embedded content
+  * ENHANCED: Development documentation with Tree-sitter setup guide
+  * FIXED: Syntax highlighting connection issues from config.lua
+  * FIXED: Basic highlighter integration with Lua bridge
+  * IMPROVED: Color customization for both highlighting systems
+  * IMPROVED: README with comprehensive syntax highlighting guide
+  * IMPROVED: Development workflow with automated dependency setup
+
+ -- dexter-xd <dexter-xd@users.noreply.github.com>  Fri, 06 Sep 2025 05:00:00 +0530
+
 loom (1.2.1-1) unstable; urgency=medium
 
   * Major update with file tree viewer and project navigation

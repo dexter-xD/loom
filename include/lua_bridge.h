@@ -16,7 +16,7 @@ extern "C" {
 }
 
 // forward declaration
-class SyntaxHighlighter;
+class TreeSitterHighlighter;
 class PluginManager;
 
 // interface between c++ editor and lua scripting engine
@@ -52,6 +52,12 @@ public:
 
     QMap<QString, QString> getKeybindings();
 
+    QMap<QString, QString> getSyntaxColors();
+
+    QMap<QString, QString> getMarkdownSyntaxColors();
+
+    QMap<QString, QString> getBasicHighlighterColors();
+
     void setEditorText(const QString &text);
     QString getEditorText() const;
     void setEditorCursorPosition(int line, int column);
@@ -59,7 +65,7 @@ public:
 
     void updateEditorState(const QString &text, int line, int column);
 
-    void setSyntaxHighlighter(SyntaxHighlighter *highlighter);
+    void setSyntaxHighlighter(TreeSitterHighlighter *highlighter);
 
     void loadSyntaxRulesForLanguage(const QString &language);
 
@@ -81,7 +87,7 @@ private:
     QString m_currentText;
     QPair<int, int> m_currentCursorPosition;
 
-    SyntaxHighlighter *m_syntaxHighlighter;
+    TreeSitterHighlighter *m_syntaxHighlighter;
 
     PluginManager *m_pluginManager;
 
@@ -123,4 +129,4 @@ private:
     static int lua_toggleTheme(lua_State *L);
 };
 
-#endif 
+#endif

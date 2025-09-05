@@ -30,6 +30,174 @@ Built with C++ and Qt, featuring Lua scripting for configuration and plugins
 - **Line Numbers** - Optional line number display with relative numbering
 - **Find & Replace** - Built-in search and replace functionality
 
+## Syntax Highlighting
+
+Loom features a dual syntax highlighting system that provides comprehensive language support with beautiful, customizable colors.
+
+### Highlighting Systems
+
+#### Tree-sitter Syntax Highlighting
+**Advanced syntax highlighting for programming languages using Tree-sitter parsers.**
+
+**Supported Languages:**
+- **C/C++** - Full syntax highlighting with semantic analysis
+- **Python** - Complete Python syntax support
+- **JavaScript/TypeScript** - Modern JS/TS features
+- **Java** - Object-oriented programming constructs
+- **Rust** - Systems programming language support
+- **Go** - Google's Go language
+- **Lua** - Scripting language used for configuration
+
+**Features:**
+- **Semantic Highlighting** - Understands code structure and relationships
+- **Context-Aware** - Different highlighting for variables, functions, types
+- **Fast & Accurate** - Tree-sitter provides precise parsing
+- **Extensible** - Easy to add new language support
+
+#### Basic Qt Syntax Highlighting
+**Lightweight syntax highlighting for web technologies and data formats.**
+
+**Supported Formats:**
+- **HTML** - Web markup with tags, attributes, entities
+- **CSS** - Stylesheets with properties, values, selectors
+- **JSON** - Data format with keys, strings, numbers, booleans
+- **JavaScript** (embedded) - Scripts within HTML `<script>` tags
+- **CSS** (embedded) - Styles within HTML `<style>` tags
+  **Markdown** - Rich text formatting with headers, links, code blocks
+
+**Features:**
+- **Web Integration** - Handles embedded CSS/JS in HTML files
+- **Fast Parsing** - Regex-based highlighting for speed
+- **Data Format Support** - JSON with proper value type highlighting
+- **Theme Consistency** - Matches Tree-sitter color schemes
+
+### Syntax Highlighting Configuration
+
+#### Tree-sitter Colors (`config/config.lua`)
+
+Customize syntax highlighting colors for programming languages:
+
+```lua
+-- Syntax highlighting colors for Tree-sitter highlighters
+syntax = {
+    -- Language constructs
+    keyword = "#fb4934",        -- Keywords (if, for, function, etc.)
+    control = "#fb4934",        -- Control flow (if, else, while, etc.)
+    type = "#fabd2f",          -- Types (int, string, class, etc.)
+    ["function"] = "#83a598",   -- Function names
+    constant = "#d3869b",       -- Constants (true, false, null, etc.)
+    builtin = "#458588",       -- Built-in functions/types
+
+    -- Data and literals
+    string = "#b8bb26",        -- String literals
+    number = "#d3869b",        -- Numeric literals
+    comment = "#928374",       -- Comments
+
+    -- Operators and punctuation
+    operator = "#fe8019",      -- Operators (+, -, *, /, etc.)
+    punctuation = "#ebdbb2",   -- Brackets, commas, semicolons
+
+    -- Special elements
+    preprocessor = "#8ec07c",  -- Preprocessor directives (#include, #define)
+    annotation = "#fabd2f",    -- Annotations/decorators
+    escape = "#fe8019"         -- Escape sequences in strings
+}
+```
+
+#### Basic Highlighter Colors (`config/config.lua`)
+
+Customize colors for web technologies and data formats:
+
+```lua
+-- Basic highlighter colors for HTML, CSS, JSON, and embedded content
+basic_highlighter = {
+    -- HTML-specific colors
+    tag = "#fb4934",           -- HTML tags (<div>, <p>, </body>)
+    attribute = "#fabd2f",     -- HTML attributes (class, id, href)
+    attribute_value = "#b8bb26", -- HTML attribute values ("value", 'value')
+    entity = "#fe8019",        -- HTML entities (&, <, >)
+
+    -- CSS-specific colors (standalone and embedded)
+    css_property = "#83a598",  -- CSS properties (color, background, margin)
+    css_value = "#d3869b",     -- CSS values (#fff, 20px, center)
+    css_selector = "#fabd2f",  -- CSS selectors (.class, #id, element)
+
+    -- JavaScript colors (embedded in HTML)
+    js_keyword = "#fb4934",    -- JS keywords (function, var, if, else)
+    js_string = "#b8bb26",     -- JS strings ("hello", 'world')
+    js_comment = "#928374",    -- JS comments (// comment, /* block */)
+    js_function = "#83a598",   -- JS function names
+
+    -- JSON-specific colors
+    json_key = "#fabd2f",      -- JSON object keys ("name", "version")
+    json_string = "#b8bb26",   -- JSON string values ("value")
+    json_number = "#d3869b",   -- JSON numbers (1, 2.5, 3.14)
+    json_boolean = "#fb4934",  -- JSON booleans (true, false)
+    json_null = "#fe8019"      -- JSON null values
+}
+```
+
+### Color Customization Guide
+
+#### Understanding Color Values
+- Colors use **hexadecimal format**: `#RRGGBB`
+- **Examples:**
+  - `#fb4934` - Bright red
+  - `#fabd2f` - Bright yellow
+  - `#b8bb26` - Bright green
+  - `#83a598` - Bright blue
+  - `#d3869b` - Bright purple
+  - `#fe8019` - Bright orange
+  - `#928374` - Gray
+
+#### Customizing Colors
+
+1. **Edit Configuration File:**
+   ```bash
+   # Open the configuration file
+   nano config/config.lua
+   ```
+
+2. **Modify Color Values:**
+   ```lua
+   -- Change keyword color to blue
+   syntax = {
+       keyword = "#83a598",  -- Changed from red to blue
+       -- ... other colors
+   }
+
+   -- Change HTML tags to purple
+   basic_highlighter = {
+       tag = "#d3869b",  -- Changed from red to purple
+       -- ... other colors
+   }
+   ```
+
+3. **Apply Changes:**
+   - Save the configuration file
+   - Restart Loom or reload configuration
+   - Colors update immediately for new files
+   - Existing files may need reopening
+
+#### Theme Consistency
+
+For consistent theming across both highlighting systems:
+
+```lua
+-- Example: Blue theme
+syntax = {
+    keyword = "#83a598",
+    string = "#b8bb26",
+    comment = "#928374"
+}
+
+basic_highlighter = {
+    tag = "#83a598",        -- Match keyword color
+    attribute = "#fabd2f",  -- Use complementary yellow
+    css_property = "#83a598" -- Match keyword color
+}
+```
+
 ### Plugin System
 - **Extensible Architecture** - Lua-based plugin system for unlimited customization
 - **Theme Switcher Plugin** - Easy theme switching with keyboard shortcuts and menu integration
@@ -62,10 +230,10 @@ Before building Loom, ensure you have the following installed:
 #### Linux (Ubuntu/Debian) - DEB Package (Recommended)
 ```bash
 # Download the latest DEB package from GitHub releases
-wget https://github.com/dexter-xd/loom/releases/download/beta_1.2.1/loom_1.2.1_amd64.deb
+wget https://github.com/dexter-xd/loom/releases/download/beta_1.2.2/loom_1.2.2_amd64.deb
 
 # Install the package
-sudo dpkg -i loom_1.2.1_amd64.deb
+sudo dpkg -i loom_1.2.2_amd64.deb
 sudo apt-get install -f  # Fix any dependency issues
 
 # Run Loom
@@ -590,6 +758,53 @@ keybindings = {
 
 ## Development
 
+### Project Structure
+
+```
+loom/
+├── src/                    # Main source code
+├── include/               # Header files
+├── config/               # Configuration files
+├── plugins/              # Lua plugins
+├── themes/               # Qt theme files
+├── test_files/           # Sample files for testing
+├── external/             # External dependencies (Tree-sitter)
+│   ├── tree-sitter/      # Tree-sitter core library
+│   ├── tree-sitter-c/    # C language grammar
+│   ├── tree-sitter-cpp/  # C++ language grammar
+│   ├── tree-sitter-python/  # Python language grammar
+│   └── ...               # Other language grammars
+├── scripts/              # Build and utility scripts
+└── debian/               # Debian packaging files
+```
+
+### External Dependencies
+
+Loom uses **Tree-sitter** for advanced syntax highlighting. The Tree-sitter bindings and language grammars are included in the `external/` directory:
+
+- **tree-sitter/**: Core Tree-sitter library
+- **tree-sitter-*/**: Language-specific grammars for syntax highlighting
+- These are **development dependencies** and should be committed to version control
+- The `external/` folder is gitignored to avoid committing large binaries
+
+#### Downloading Tree-sitter Dependencies
+
+For new development setups, use the provided script to download all Tree-sitter dependencies:
+
+```bash
+# Download all Tree-sitter language grammars
+chmod +x scripts/download_tree_sitter_deps.sh
+./scripts/download_tree_sitter_deps.sh
+```
+
+This script will:
+- Download the Tree-sitter core library
+- Clone all supported language grammars (C, C++, Python, JavaScript, Rust, Java, Go, Lua)
+- Set up the `external/` directory structure
+- Provide clear progress feedback
+
+**Note:** The external dependencies are required for Tree-sitter syntax highlighting to work properly during development.
+
 ### Debug Build
 
 For development and debugging:
@@ -622,11 +837,15 @@ editor.debug_log("Debug message from Lua")
 Test your changes with the provided sample files in `test_files/`:
 
 ```bash
-# Test with different file types
+# Test Tree-sitter highlighting
 ./scripts/run_loom.sh test_files/sample.cpp
-./scripts/run_loom.sh test_files/sample.js
 ./scripts/run_loom.sh test_files/sample.py
-./scripts/run_loom.sh test_files/sample.lua
+./scripts/run_loom.sh test_files/sample.js
+
+# Test basic highlighting
+./scripts/run_loom.sh test_files/sample.html
+./scripts/run_loom.sh test_files/sample.json
+./scripts/run_loom.sh test_files/style.css
 ```
 
 ### Creating DEB Packages

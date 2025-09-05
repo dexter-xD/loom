@@ -18,6 +18,9 @@
 #include <QIcon>
 #include <QTabBar>
 #include <QToolButton>
+#include "tree_sitter_highlighter.h"
+#include "markdown_highlighter.h"
+#include "basic_highlighter.h"
 
 EditorWindow::EditorWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -81,6 +84,8 @@ EditorWindow::~EditorWindow()
 
     m_textEditors.clear();
     m_syntaxHighlighters.clear();
+    m_markdownHighlighters.clear();
+    m_basicHighlighters.clear();
 
     delete m_pluginManager;
     delete m_luaBridge;
@@ -1169,90 +1174,158 @@ void EditorWindow::detectAndSetLanguage(const QString &filePath)
     }
 
     int currentIndex = getCurrentTabIndex();
-    if (currentIndex < 0 || currentIndex >= m_syntaxHighlighters.size()) {
-        return;
-    }
-
-    SyntaxHighlighter* highlighter = m_syntaxHighlighters[currentIndex];
-    if (!highlighter) {
+    if (currentIndex < 0) {
         return;
     }
 
     QString language = detectLanguageFromExtension(filePath);
-
     DEBUG_LOG_EDITOR("Detected language:" << language << "for file:" << filePath);
 
-    highlighter->setLanguage(language);
+    // For HTML, CSS, and JSON files, use BasicHighlighter
+    if (language == "html" || language == "css" || language == "json") {
+        if (currentIndex >= m_basicHighlighters.size()) {
+            return;
+        }
 
-    m_luaBridge->loadSyntaxRulesForLanguage(language);
+        BasicHighlighter* basicHighlighter = m_basicHighlighters[currentIndex];
+        if (!basicHighlighter) {
+            return;
+        }
 
-    highlighter->rehighlight();
+        basicHighlighter->setLanguage(language);
+
+        // Ensure the highlighter is properly connected to the document
+        CodeEditor* textEdit = m_textEditors[currentIndex];
+        if (textEdit && textEdit->document()) {
+            // Reconnect the highlighter to ensure it's active
+            delete basicHighlighter;
+            basicHighlighter = new BasicHighlighter(textEdit->document());
+            m_basicHighlighters[currentIndex] = basicHighlighter;
+
+            if (m_luaBridge) {
+                basicHighlighter->setLuaBridge(m_luaBridge);
+            }
+
+            basicHighlighter->setLanguage(language);
+        }
+
+        basicHighlighter->rehighlight();
+
+        DEBUG_LOG_EDITOR("Using BasicHighlighter for tab" << currentIndex << "language:" << language);
+    }
+    // For Markdown files, use MarkdownHighlighter
+    else if (language == "markdown") {
+        if (currentIndex >= m_markdownHighlighters.size()) {
+            return;
+        }
+
+        MarkdownHighlighter* markdownHighlighter = m_markdownHighlighters[currentIndex];
+        if (!markdownHighlighter) {
+            return;
+        }
+
+        markdownHighlighter->setLanguage(language);
+        markdownHighlighter->rehighlight();
+
+        DEBUG_LOG_EDITOR("Using MarkdownHighlighter for tab" << currentIndex);
+    } else {
+        // For other languages, use TreeSitterHighlighter
+        if (currentIndex >= m_syntaxHighlighters.size()) {
+            return;
+        }
+
+        TreeSitterHighlighter* highlighter = m_syntaxHighlighters[currentIndex];
+        if (!highlighter) {
+            return;
+        }
+
+        highlighter->setLanguage(language);
+        m_luaBridge->loadSyntaxRulesForLanguage(language);
+        highlighter->rehighlight();
+
+        DEBUG_LOG_EDITOR("Using TreeSitterHighlighter for tab" << currentIndex);
+    }
 }
 
 QString EditorWindow::detectLanguageFromExtension(const QString &filePath)
 {
     QFileInfo fileInfo(filePath);
     QString extension = fileInfo.suffix().toLower();
+    QString fileName = fileInfo.fileName().toLower();
 
     static QMap<QString, QString> extensionMap = {
+        // C/C++
         {"cpp", "cpp"},
         {"cxx", "cpp"},
         {"cc", "cpp"},
         {"c++", "cpp"},
-        {"c", "cpp"},
+        {"c", "c"},
         {"h", "cpp"},
         {"hpp", "cpp"},
         {"hxx", "cpp"},
         {"h++", "cpp"},
-        {"lua", "lua"},
-        {"py", "python"},
-        {"pyw", "python"},
+
+        // Web languages
         {"js", "javascript"},
         {"jsx", "javascript"},
-        {"ts", "typescript"},
-        {"tsx", "typescript"},
-        {"java", "java"},
-        {"cs", "csharp"},
-        {"php", "php"},
-        {"rb", "ruby"},
-        {"go", "go"},
-        {"rs", "rust"},
-        {"sh", "bash"},
-        {"bash", "bash"},
-        {"zsh", "bash"},
-        {"fish", "bash"},
-        {"ps1", "powershell"},
-        {"xml", "xml"},
+        {"ts", "javascript"}, // TypeScript treated as JavaScript for now
+        {"tsx", "javascript"},
         {"html", "html"},
         {"htm", "html"},
         {"css", "css"},
         {"scss", "css"},
         {"sass", "css"},
         {"less", "css"},
+
+        // Other languages
+        {"py", "python"},
+        {"pyw", "python"},
+        {"java", "java"},
+        {"rs", "rust"},
+        {"go", "go"},
+        {"lua", "lua"},
+        {"rb", "ruby"},
+        {"php", "php"},
+        {"cs", "csharp"},
+        {"sh", "bash"},
+        {"bash", "bash"},
+        {"zsh", "bash"},
+        {"fish", "bash"},
+        {"ps1", "powershell"},
+
+        // Data formats
         {"json", "json"},
+        {"xml", "xml"},
         {"yaml", "yaml"},
         {"yml", "yaml"},
         {"toml", "toml"},
         {"ini", "ini"},
         {"cfg", "ini"},
         {"conf", "ini"},
+
+        // Documentation
         {"md", "markdown"},
         {"markdown", "markdown"},
+
+        // Other
         {"txt", "text"},
         {"log", "text"}
     };
 
     QString language = extensionMap.value(extension, "text");
 
+    // Special file name detection
     if (language == "text") {
-        QString fileName = fileInfo.fileName().toLower();
-
         if (fileName == "makefile" || fileName == "cmake" || fileName.startsWith("cmake")) {
             language = "cmake";
         } else if (fileName == "dockerfile" || fileName.startsWith("dockerfile")) {
             language = "dockerfile";
         } else if (fileName.endsWith(".qss")) {
-            language = "css"; 
+            language = "css";
+        } else if (fileName == "cargo.toml") {
+            language = "toml";
+        } else if (fileName == "package.json") {
+            language = "json";
         }
     }
 
@@ -1317,16 +1390,28 @@ int EditorWindow::createNewTab(const QString &title)
         }
     }
 
-    SyntaxHighlighter* highlighter = new SyntaxHighlighter(textEdit->document());
+    TreeSitterHighlighter* highlighter = new TreeSitterHighlighter(textEdit->document());
     m_syntaxHighlighters.append(highlighter);
+
+    MarkdownHighlighter* markdownHighlighter = new MarkdownHighlighter(textEdit->document());
+    m_markdownHighlighters.append(markdownHighlighter);
+
+    BasicHighlighter* basicHighlighter = new BasicHighlighter(textEdit->document());
+    m_basicHighlighters.append(basicHighlighter);
+
+    if (m_luaBridge) {
+        markdownHighlighter->setLuaBridge(m_luaBridge);
+        basicHighlighter->setLuaBridge(m_luaBridge);
+    }
 
     if (m_luaBridge) {
         m_luaBridge->setSyntaxHighlighter(highlighter);
+        highlighter->setLuaBridge(m_luaBridge);
     }
 
     highlighter->setLanguage("text");
 
-    DEBUG_LOG_EDITOR("Created syntax highlighter for tab" << (m_tabWidget->count() - 1) << "with language: text");
+    DEBUG_LOG_EDITOR("Created syntax highlighters for tab" << (m_tabWidget->count() - 1) << "with language: text");
 
     connect(textEdit, &CodeEditor::textChanged, 
             this, &EditorWindow::onTextChanged);
@@ -1386,7 +1471,7 @@ CodeEditor* EditorWindow::getCurrentTextEditor()
     return nullptr;
 }
 
-SyntaxHighlighter* EditorWindow::getCurrentSyntaxHighlighter()
+TreeSitterHighlighter* EditorWindow::getCurrentSyntaxHighlighter()
 {
     int currentIndex = m_tabWidget->currentIndex();
     if (currentIndex >= 0 && currentIndex < m_syntaxHighlighters.size()) {
@@ -1407,7 +1492,7 @@ void EditorWindow::setupSyntaxHighlightingForTab(int index)
     }
 
     CodeEditor* textEdit = m_textEditors[index];
-    SyntaxHighlighter* highlighter = m_syntaxHighlighters[index];
+    TreeSitterHighlighter* highlighter = m_syntaxHighlighters[index];
 
     if (!textEdit || !highlighter) {
         DEBUG_LOG_EDITOR("Cannot setup syntax highlighting for tab" << index << ": missing components");
@@ -1502,6 +1587,8 @@ void EditorWindow::closeFile(int index)
 
     m_textEditors.removeAt(index);
     m_syntaxHighlighters.removeAt(index);
+    m_markdownHighlighters.removeAt(index);
+    m_basicHighlighters.removeAt(index);
 
     if (m_tabWidget->count() == 0) {
         createNewTab();
@@ -1724,7 +1811,7 @@ void EditorWindow::setCurrentLanguage(const QString &language)
         return;
     }
 
-    SyntaxHighlighter* highlighter = m_syntaxHighlighters[currentIndex];
+    TreeSitterHighlighter* highlighter = m_syntaxHighlighters[currentIndex];
     if (!highlighter) {
         m_statusBar->showMessage("No syntax highlighter available", 2000);
         return;

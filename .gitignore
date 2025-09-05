@@ -31,3 +31,8 @@ Thumbs.db
 *.tmp
 *.bak
 *~
+
+# external dependencies (Tree-sitter bindings)
+external/
+test_files/
+test_files/*
