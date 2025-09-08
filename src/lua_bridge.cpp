@@ -1,5 +1,5 @@
 #include "lua_bridge.h"
-#include "tree_sitter_highlighter.h"
+#include "syntax_highlighter.h"
 #include "plugin_manager.h"
 #include "debug_log.h"
 #include <QDir>
@@ -747,7 +747,7 @@ bool LuaBridge::executeFile(const QString &filePath)
     return true;
 }
 
-void LuaBridge::setSyntaxHighlighter(TreeSitterHighlighter *highlighter)
+void LuaBridge::setSyntaxHighlighter(SyntaxHighlighter *highlighter)
 {
     m_syntaxHighlighter = highlighter;
 

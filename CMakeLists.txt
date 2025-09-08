@@ -36,60 +36,11 @@ set(SOURCES
     src/code_editor.cpp
     src/line_number_area.cpp
     src/file_tree_widget.cpp
-    src/tree_sitter_highlighter.cpp
-    src/markdown_highlighter.cpp
-    src/basic_highlighter.cpp
+    src/syntax_highlighter.cpp
+    src/syntax_rules.cpp
 )
 
-# Tree-sitter sources
-set(TREE_SITTER_SOURCES
-    external/tree-sitter/lib/src/lib.c
-)
-
-# Tree-sitter C grammar sources
-set(TREE_SITTER_C_SOURCES
-    external/tree-sitter-c/src/parser.c
-)
-
-# Tree-sitter C++ grammar sources
-set(TREE_SITTER_CPP_SOURCES
-    external/tree-sitter-cpp/src/parser.c
-    external/tree-sitter-cpp/src/scanner.c
-)
-
-# Tree-sitter JavaScript grammar sources
-set(TREE_SITTER_JAVASCRIPT_SOURCES
-    external/tree-sitter-javascript/src/parser.c
-    external/tree-sitter-javascript/src/scanner.c
-)
-
-# Tree-sitter Python grammar sources
-set(TREE_SITTER_PYTHON_SOURCES
-    external/tree-sitter-python/src/parser.c
-    external/tree-sitter-python/src/scanner.c
-)
-
-# Tree-sitter Rust grammar sources
-set(TREE_SITTER_RUST_SOURCES
-    external/tree-sitter-rust/src/parser.c
-    external/tree-sitter-rust/src/scanner.c
-)
-
-# Tree-sitter Java grammar sources
-set(TREE_SITTER_JAVA_SOURCES
-    external/tree-sitter-java/src/parser.c
-)
-
-# Tree-sitter Go grammar sources
-set(TREE_SITTER_GO_SOURCES
-    external/tree-sitter-go/src/parser.c
-)
-
-# Tree-sitter Lua grammar sources
-set(TREE_SITTER_LUA_SOURCES
-    external/tree-sitter-lua/src/parser.c
-    external/tree-sitter-lua/src/scanner.c
-)
+# Removed Tree-sitter sources - using custom syntax highlighter instead
 
 
 
@@ -106,9 +57,8 @@ set(HEADERS
     include/code_editor.h
     include/line_number_area.h
     include/file_tree_widget.h
-    include/tree_sitter_highlighter.h
-    include/markdown_highlighter.h
-    include/basic_highlighter.h
+    include/syntax_highlighter.h
+    include/syntax_rules.h
 )
 
 include_directories(include)
@@ -117,50 +67,7 @@ include_directories(include)
 set(RESOURCE_FILES themes/gruvbox.qss)
 qt5_add_resources(RESOURCES themes.qrc)
 
-# Build Tree-sitter as static library
-add_library(tree-sitter STATIC ${TREE_SITTER_SOURCES})
-target_include_directories(tree-sitter PUBLIC external/tree-sitter/lib/include)
-set_target_properties(tree-sitter PROPERTIES AUTOMOC OFF LINKER_LANGUAGE C)
-
-# Build Tree-sitter C grammar as static library
-add_library(tree-sitter-c STATIC ${TREE_SITTER_C_SOURCES})
-target_include_directories(tree-sitter-c PUBLIC external/tree-sitter/lib/include external/tree-sitter-c/src)
-set_target_properties(tree-sitter-c PROPERTIES AUTOMOC OFF LINKER_LANGUAGE C)
-
-# Build Tree-sitter C++ grammar as static library
-add_library(tree-sitter-cpp STATIC ${TREE_SITTER_CPP_SOURCES})
-target_include_directories(tree-sitter-cpp PUBLIC external/tree-sitter/lib/include external/tree-sitter-cpp/src)
-set_target_properties(tree-sitter-cpp PROPERTIES AUTOMOC OFF LINKER_LANGUAGE C)
-
-# Build Tree-sitter JavaScript grammar as static library
-add_library(tree-sitter-javascript STATIC ${TREE_SITTER_JAVASCRIPT_SOURCES})
-target_include_directories(tree-sitter-javascript PUBLIC external/tree-sitter/lib/include external/tree-sitter-javascript/src)
-set_target_properties(tree-sitter-javascript PROPERTIES AUTOMOC OFF LINKER_LANGUAGE C)
-
-# Build Tree-sitter Python grammar as static library
-add_library(tree-sitter-python STATIC ${TREE_SITTER_PYTHON_SOURCES})
-target_include_directories(tree-sitter-python PUBLIC external/tree-sitter/lib/include external/tree-sitter-python/src)
-set_target_properties(tree-sitter-python PROPERTIES AUTOMOC OFF LINKER_LANGUAGE C)
-
-# Build Tree-sitter Rust grammar as static library
-add_library(tree-sitter-rust STATIC ${TREE_SITTER_RUST_SOURCES})
-target_include_directories(tree-sitter-rust PUBLIC external/tree-sitter/lib/include external/tree-sitter-rust/src)
-set_target_properties(tree-sitter-rust PROPERTIES AUTOMOC OFF LINKER_LANGUAGE C)
-
-# Build Tree-sitter Java grammar as static library
-add_library(tree-sitter-java STATIC ${TREE_SITTER_JAVA_SOURCES})
-target_include_directories(tree-sitter-java PUBLIC external/tree-sitter/lib/include external/tree-sitter-java/src)
-set_target_properties(tree-sitter-java PROPERTIES AUTOMOC OFF LINKER_LANGUAGE C)
-
-# Build Tree-sitter Go grammar as static library
-add_library(tree-sitter-go STATIC ${TREE_SITTER_GO_SOURCES})
-target_include_directories(tree-sitter-go PUBLIC external/tree-sitter/lib/include external/tree-sitter-go/src)
-set_target_properties(tree-sitter-go PROPERTIES AUTOMOC OFF LINKER_LANGUAGE C)
-
-# Build Tree-sitter Lua grammar as static library
-add_library(tree-sitter-lua STATIC ${TREE_SITTER_LUA_SOURCES})
-target_include_directories(tree-sitter-lua PUBLIC external/tree-sitter/lib/include external/tree-sitter-lua/src)
-set_target_properties(tree-sitter-lua PROPERTIES AUTOMOC OFF LINKER_LANGUAGE C)
+# Removed Tree-sitter library builds - using custom syntax highlighter instead
 
 
 
@@ -176,30 +83,12 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Core
     Qt5::Widgets
     ${LUA_LIBRARIES}
-    tree-sitter-c
-    tree-sitter-cpp
-    tree-sitter-javascript
-    tree-sitter-python
-    tree-sitter-rust
-    tree-sitter-java
-    tree-sitter-go
-    tree-sitter-lua
-    tree-sitter
 )
 
 # include directories
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${LUA_INCLUDE_DIR}
-    external/tree-sitter/lib/include
-    external/tree-sitter-c/src
-    external/tree-sitter-cpp/src
-    external/tree-sitter-javascript/src
-    external/tree-sitter-python/src
-    external/tree-sitter-rust/src
-    external/tree-sitter-java/src
-    external/tree-sitter-go/src
-    external/tree-sitter-lua/src
 )
 
 # copy config and plugins folders to build directory

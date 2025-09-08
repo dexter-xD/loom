@@ -59,23 +59,15 @@ int EditorWindow::createNewTab(const QString &title)
         }
     }
 
-    TreeSitterHighlighter* highlighter = new TreeSitterHighlighter(textEdit->document());
+    SyntaxHighlighter* highlighter = new SyntaxHighlighter(textEdit->document());
     m_syntaxHighlighters.append(highlighter);
 
-    MarkdownHighlighter* markdownHighlighter = new MarkdownHighlighter(textEdit->document());
-    m_markdownHighlighters.append(markdownHighlighter);
-
-    BasicHighlighter* basicHighlighter = new BasicHighlighter(textEdit->document());
-    m_basicHighlighters.append(basicHighlighter);
-
     if (m_luaBridge) {
-        markdownHighlighter->setLuaBridge(m_luaBridge);
-        basicHighlighter->setLuaBridge(m_luaBridge);
+        highlighter->setLuaBridge(m_luaBridge);
     }
 
     if (m_luaBridge) {
         m_luaBridge->setSyntaxHighlighter(highlighter);
-        highlighter->setLuaBridge(m_luaBridge);
     }
 
     highlighter->setLanguage("text");
@@ -140,7 +132,7 @@ CodeEditor* EditorWindow::getCurrentTextEditor()
     return nullptr;
 }
 
-TreeSitterHighlighter* EditorWindow::getCurrentSyntaxHighlighter()
+SyntaxHighlighter* EditorWindow::getCurrentSyntaxHighlighter()
 {
     int currentIndex = m_tabWidget->currentIndex();
     if (currentIndex >= 0 && currentIndex < m_syntaxHighlighters.size()) {
@@ -161,7 +153,7 @@ void EditorWindow::setupSyntaxHighlightingForTab(int index)
     }
 
     CodeEditor* textEdit = m_textEditors[index];
-    TreeSitterHighlighter* highlighter = m_syntaxHighlighters[index];
+    SyntaxHighlighter* highlighter = m_syntaxHighlighters[index];
 
     if (!textEdit || !highlighter) {
         DEBUG_LOG_EDITOR("Cannot setup syntax highlighting for tab" << index << ": missing components");
@@ -256,8 +248,6 @@ void EditorWindow::closeFile(int index)
 
     m_textEditors.removeAt(index);
     m_syntaxHighlighters.removeAt(index);
-    m_markdownHighlighters.removeAt(index);
-    m_basicHighlighters.removeAt(index);
 
     if (m_tabWidget->count() == 0) {
         createNewTab();

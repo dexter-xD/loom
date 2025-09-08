@@ -23,70 +23,36 @@ void EditorWindow::detectAndSetLanguage(const QString &filePath)
     QString language = detectLanguageFromExtension(filePath);
     DEBUG_LOG_EDITOR("Detected language:" << language << "for file:" << filePath);
 
-    // For HTML, CSS, and JSON files, use BasicHighlighter
-    if (language == "html" || language == "css" || language == "json") {
-        if (currentIndex >= m_basicHighlighters.size()) {
-            return;
-        }
-
-        BasicHighlighter* basicHighlighter = m_basicHighlighters[currentIndex];
-        if (!basicHighlighter) {
-            return;
-        }
-
-        basicHighlighter->setLanguage(language);
-
-        // Ensure the highlighter is properly connected to the document
-        CodeEditor* textEdit = m_textEditors[currentIndex];
-        if (textEdit && textEdit->document()) {
-            // Reconnect the highlighter to ensure it's active
-            delete basicHighlighter;
-            basicHighlighter = new BasicHighlighter(textEdit->document());
-            m_basicHighlighters[currentIndex] = basicHighlighter;
-
-            if (m_luaBridge) {
-                basicHighlighter->setLuaBridge(m_luaBridge);
-            }
-
-            basicHighlighter->setLanguage(language);
-        }
-
-        basicHighlighter->rehighlight();
-
-        DEBUG_LOG_EDITOR("Using BasicHighlighter for tab" << currentIndex << "language:" << language);
+    // Use SyntaxHighlighter for all languages
+    if (currentIndex >= m_syntaxHighlighters.size()) {
+        return;
     }
-    // For Markdown files, use MarkdownHighlighter
-    else if (language == "markdown") {
-        if (currentIndex >= m_markdownHighlighters.size()) {
-            return;
-        }
 
-        MarkdownHighlighter* markdownHighlighter = m_markdownHighlighters[currentIndex];
-        if (!markdownHighlighter) {
-            return;
-        }
+    SyntaxHighlighter* highlighter = m_syntaxHighlighters[currentIndex];
+    if (!highlighter) {
+        return;
+    }
 
-        markdownHighlighter->setLanguage(language);
-        markdownHighlighter->rehighlight();
+    highlighter->setLanguage(language);
 
-        DEBUG_LOG_EDITOR("Using MarkdownHighlighter for tab" << currentIndex);
-    } else {
-        // For other languages, use TreeSitterHighlighter
-        if (currentIndex >= m_syntaxHighlighters.size()) {
-            return;
-        }
+    // Ensure the highlighter is properly connected to the document
+    CodeEditor* textEdit = m_textEditors[currentIndex];
+    if (textEdit && textEdit->document()) {
+        // Reconnect the highlighter to ensure it's active
+        delete highlighter;
+        highlighter = new SyntaxHighlighter(textEdit->document());
+        m_syntaxHighlighters[currentIndex] = highlighter;
 
-        TreeSitterHighlighter* highlighter = m_syntaxHighlighters[currentIndex];
-        if (!highlighter) {
-            return;
+        if (m_luaBridge) {
+            highlighter->setLuaBridge(m_luaBridge);
         }
 
         highlighter->setLanguage(language);
-        m_luaBridge->loadSyntaxRulesForLanguage(language);
-        highlighter->rehighlight();
-
-        DEBUG_LOG_EDITOR("Using TreeSitterHighlighter for tab" << currentIndex);
     }
+
+    highlighter->rehighlight();
+
+    DEBUG_LOG_EDITOR("Using SyntaxHighlighter for tab" << currentIndex << "language:" << language);
 }
 
 QString EditorWindow::detectLanguageFromExtension(const QString &filePath)
@@ -182,7 +148,7 @@ void EditorWindow::setCurrentLanguage(const QString &language)
         return;
     }
 
-    TreeSitterHighlighter* highlighter = m_syntaxHighlighters[currentIndex];
+    SyntaxHighlighter* highlighter = m_syntaxHighlighters[currentIndex];
     if (!highlighter) {
         m_statusBar->showMessage("No syntax highlighter available", 2000);
         return;
@@ -191,11 +157,6 @@ void EditorWindow::setCurrentLanguage(const QString &language)
     DEBUG_LOG_EDITOR("Setting language to:" << language << "for tab" << currentIndex);
 
     highlighter->setLanguage(language);
-
-    if (m_luaBridge) {
-        m_luaBridge->loadSyntaxRulesForLanguage(language);
-    }
-
     highlighter->rehighlight();
 
     m_statusBar->showMessage(QString("Syntax highlighting set to: %1").arg(language.toUpper()), 3000);

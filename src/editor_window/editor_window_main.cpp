@@ -63,8 +63,6 @@ EditorWindow::~EditorWindow()
 
     m_textEditors.clear();
     m_syntaxHighlighters.clear();
-    m_markdownHighlighters.clear();
-    m_basicHighlighters.clear();
 
     delete m_pluginManager;
     delete m_luaBridge;
