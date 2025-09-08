@@ -5,6 +5,7 @@
 #ifndef EDITOR_WINDOW_H
 #define EDITOR_WINDOW_H
 
+#include <QApplication>
 #include <QMainWindow>
 #include <QPlainTextEdit>
 #include <QTabWidget>
@@ -29,6 +30,7 @@
 #include <QSplitter>
 #include "buffer.h"
 #include "lua_bridge.h"
+#include "debug_log.h"
 #include "tree_sitter_highlighter.h"
 #include "markdown_highlighter.h"
 #include "basic_highlighter.h"
