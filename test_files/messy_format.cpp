@@ -12,5 +12,4 @@ int main() {
     cout << "First element is 1" << endl;
   }
   return 0;
-  int
 }

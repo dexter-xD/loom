@@ -59,7 +59,7 @@ int EditorWindow::createNewTab(const QString &title)
         }
     }
 
-    SyntaxHighlighter* highlighter = new SyntaxHighlighter(textEdit->document());
+    KSyntaxHighlighter* highlighter = new KSyntaxHighlighter(textEdit->document());
     m_syntaxHighlighters.append(highlighter);
 
     if (m_luaBridge) {
@@ -132,7 +132,7 @@ CodeEditor* EditorWindow::getCurrentTextEditor()
     return nullptr;
 }
 
-SyntaxHighlighter* EditorWindow::getCurrentSyntaxHighlighter()
+KSyntaxHighlighter* EditorWindow::getCurrentSyntaxHighlighter()
 {
     int currentIndex = m_tabWidget->currentIndex();
     if (currentIndex >= 0 && currentIndex < m_syntaxHighlighters.size()) {
@@ -153,7 +153,7 @@ void EditorWindow::setupSyntaxHighlightingForTab(int index)
     }
 
     CodeEditor* textEdit = m_textEditors[index];
-    SyntaxHighlighter* highlighter = m_syntaxHighlighters[index];
+    KSyntaxHighlighter* highlighter = m_syntaxHighlighters[index];
 
     if (!textEdit || !highlighter) {
         DEBUG_LOG_EDITOR("Cannot setup syntax highlighting for tab" << index << ": missing components");

@@ -23,36 +23,19 @@ void EditorWindow::detectAndSetLanguage(const QString &filePath)
     QString language = detectLanguageFromExtension(filePath);
     DEBUG_LOG_EDITOR("Detected language:" << language << "for file:" << filePath);
 
-    // Use SyntaxHighlighter for all languages
+    // Use KSyntaxHighlighter for all languages
     if (currentIndex >= m_syntaxHighlighters.size()) {
         return;
     }
 
-    SyntaxHighlighter* highlighter = m_syntaxHighlighters[currentIndex];
+    KSyntaxHighlighter* highlighter = m_syntaxHighlighters[currentIndex];
     if (!highlighter) {
         return;
     }
 
     highlighter->setLanguage(language);
 
-    // Ensure the highlighter is properly connected to the document
-    CodeEditor* textEdit = m_textEditors[currentIndex];
-    if (textEdit && textEdit->document()) {
-        // Reconnect the highlighter to ensure it's active
-        delete highlighter;
-        highlighter = new SyntaxHighlighter(textEdit->document());
-        m_syntaxHighlighters[currentIndex] = highlighter;
-
-        if (m_luaBridge) {
-            highlighter->setLuaBridge(m_luaBridge);
-        }
-
-        highlighter->setLanguage(language);
-    }
-
-    highlighter->rehighlight();
-
-    DEBUG_LOG_EDITOR("Using SyntaxHighlighter for tab" << currentIndex << "language:" << language);
+    DEBUG_LOG_EDITOR("Using KSyntaxHighlighter for tab" << currentIndex << "language:" << language);
 }
 
 QString EditorWindow::detectLanguageFromExtension(const QString &filePath)
@@ -148,7 +131,7 @@ void EditorWindow::setCurrentLanguage(const QString &language)
         return;
     }
 
-    SyntaxHighlighter* highlighter = m_syntaxHighlighters[currentIndex];
+    KSyntaxHighlighter* highlighter = m_syntaxHighlighters[currentIndex];
     if (!highlighter) {
         m_statusBar->showMessage("No syntax highlighter available", 2000);
         return;

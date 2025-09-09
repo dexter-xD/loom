@@ -20,6 +20,7 @@ endif()
 # find required packages
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 find_package(Lua REQUIRED)
+find_package(KF5SyntaxHighlighting REQUIRED)
 
 # enable qt moc for Qt5
 set(CMAKE_AUTOMOC ON)
@@ -36,17 +37,8 @@ set(SOURCES
     src/code_editor.cpp
     src/line_number_area.cpp
     src/file_tree_widget.cpp
-    src/syntax_highlighter.cpp
-    src/syntax_rules.cpp
+    src/ksyntax_highlighter.cpp
 )
-
-# Removed Tree-sitter sources - using custom syntax highlighter instead
-
-
-
-
-
-
 
 # header files (needed for MOC processing)
 set(HEADERS
@@ -57,8 +49,7 @@ set(HEADERS
     include/code_editor.h
     include/line_number_area.h
     include/file_tree_widget.h
-    include/syntax_highlighter.h
-    include/syntax_rules.h
+    include/ksyntax_highlighter.h
 )
 
 include_directories(include)
@@ -83,6 +74,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Core
     Qt5::Widgets
     ${LUA_LIBRARIES}
+    KF5::SyntaxHighlighting
 )
 
 # include directories

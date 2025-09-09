@@ -31,7 +31,7 @@
 #include "buffer.h"
 #include "lua_bridge.h"
 #include "debug_log.h"
-#include "syntax_highlighter.h"
+#include "ksyntax_highlighter.h"
 #include "plugin_manager.h"
 #include "code_editor.h"
 #include "file_tree_widget.h"
@@ -106,7 +106,7 @@ private:
 
     QList<Buffer*> m_buffers;
     QList<CodeEditor*> m_textEditors;
-    QList<SyntaxHighlighter*> m_syntaxHighlighters;
+    QList<KSyntaxHighlighter*> m_syntaxHighlighters;
 
     LuaBridge *m_luaBridge;
 
@@ -132,7 +132,7 @@ private:
     void updateTabModificationIndicator(int index);
     Buffer* getCurrentBuffer();
     CodeEditor* getCurrentTextEditor();
-    SyntaxHighlighter* getCurrentSyntaxHighlighter();
+    KSyntaxHighlighter* getCurrentSyntaxHighlighter();
     int getCurrentTabIndex();
 
     void setupSyntaxHighlighting();

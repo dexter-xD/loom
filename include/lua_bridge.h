@@ -16,7 +16,7 @@ extern "C" {
 }
 
 // forward declaration
-class SyntaxHighlighter;
+class KSyntaxHighlighter;
 class PluginManager;
 
 // interface between c++ editor and lua scripting engine
@@ -65,7 +65,7 @@ public:
 
     void updateEditorState(const QString &text, int line, int column);
 
-    void setSyntaxHighlighter(SyntaxHighlighter *highlighter);
+    void setSyntaxHighlighter(KSyntaxHighlighter *highlighter);
 
     void loadSyntaxRulesForLanguage(const QString &language);
 
@@ -87,7 +87,7 @@ private:
     QString m_currentText;
     QPair<int, int> m_currentCursorPosition;
 
-    SyntaxHighlighter *m_syntaxHighlighter;
+    KSyntaxHighlighter *m_syntaxHighlighter;
 
     PluginManager *m_pluginManager;
 
