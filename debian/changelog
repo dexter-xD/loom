@@ -1,3 +1,21 @@
+loom (1.2.5-1) unstable; urgency=medium
+
+  * Beta release with major performance improvements and syntax highlighting overhaul
+  * REMOVED: Tree-sitter syntax highlighting system due to performance issues
+  * REMOVED: Qt syntax highlighters causing slow performance
+  * NEW: KSyntaxHighlighting integration for smooth, fast syntax highlighting
+  * NEW: Single unified highlighting system using KDE's KSyntaxHighlighting
+  * ENHANCED: Significant performance improvements with smooth operation
+  * ENHANCED: Comprehensive syntax highlighting for all supported languages
+  * ENHANCED: Better resource management and memory usage
+  * FIXED: Performance bottlenecks and slow rendering issues
+  * FIXED: Syntax highlighting causing UI freezing and lag
+  * IMPROVED: Overall editor responsiveness and user experience
+  * IMPROVED: Cleaner codebase with removed performance-heavy dependencies
+  * IMPROVED: Documentation updated for new highlighting system
+
+ -- dexter-xd <dexter-xd@users.noreply.github.com>  Tue, 09 Sep 2025 07:00:00 +0530
+
 loom (1.2.2-1) unstable; urgency=medium
 
   * Beta release with syntax highlighting fixes and improvements

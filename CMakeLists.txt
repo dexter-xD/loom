@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # project configuration
-project(loom VERSION 1.2.2 LANGUAGES CXX C)
+project(loom VERSION 1.2.5 LANGUAGES CXX C)
 
 # set c++ standard
 set(CMAKE_CXX_STANDARD 17)

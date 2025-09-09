@@ -12,6 +12,7 @@ Built with C++ and Qt, featuring Lua scripting for configuration and plugins
 [![Qt Version](https://img.shields.io/badge/Qt-5.x-green)]()
 [![C++ Standard](https://img.shields.io/badge/C++-17-blue)]()
 [![Lua](https://img.shields.io/badge/Lua-5.1-lightblue.svg)]()
+[![KSyntaxHighlighting](https://img.shields.io/badge/KSyntaxHighlighting-300%2B%20Languages-orange)]()
 
 ![Loom Banner](banner.png)
 
@@ -32,110 +33,83 @@ Built with C++ and Qt, featuring Lua scripting for configuration and plugins
 
 ## Syntax Highlighting
 
-Loom features a dual syntax highlighting system that provides comprehensive language support with beautiful, customizable colors.
+Loom features optimized syntax highlighting powered by KDE's KSyntaxHighlighting framework, providing smooth, fast, and comprehensive language support with beautiful, customizable colors.
 
-### Highlighting Systems
+### KSyntaxHighlighting System
 
-#### Tree-sitter Syntax Highlighting
-**Advanced syntax highlighting for programming languages using Tree-sitter parsers.**
+**Professional-grade syntax highlighting with excellent performance and comprehensive language support.**
 
-**Supported Languages:**
-- **C/C++** - Full syntax highlighting with semantic analysis
-- **Python** - Complete Python syntax support
-- **JavaScript/TypeScript** - Modern JS/TS features
-- **Java** - Object-oriented programming constructs
-- **Rust** - Systems programming language support
-- **Go** - Google's Go language
-- **Lua** - Scripting language used for configuration
-
-**Features:**
-- **Semantic Highlighting** - Understands code structure and relationships
-- **Context-Aware** - Different highlighting for variables, functions, types
-- **Fast & Accurate** - Tree-sitter provides precise parsing
-- **Extensible** - Easy to add new language support
-
-#### Basic Qt Syntax Highlighting
-**Lightweight syntax highlighting for web technologies and data formats.**
-
-**Supported Formats:**
-- **HTML** - Web markup with tags, attributes, entities
-- **CSS** - Stylesheets with properties, values, selectors
-- **JSON** - Data format with keys, strings, numbers, booleans
-- **JavaScript** (embedded) - Scripts within HTML `<script>` tags
-- **CSS** (embedded) - Styles within HTML `<style>` tags
-  **Markdown** - Rich text formatting with headers, links, code blocks
+**Supported Languages & Formats (300+):**
+- **Programming Languages**: C/C++, Python, JavaScript/TypeScript, Java, Rust, Go, Lua, PHP, Ruby, Swift, Kotlin, Scala, Haskell, Erlang, Elixir, Clojure, Scheme, R, Julia, MATLAB, Perl, Shell/Bash, PowerShell, SQL, GraphQL, YAML, TOML, XML
+- **Web Technologies**: HTML, CSS, SCSS/Sass, Less, JavaScript, TypeScript, JSX, TSX, Vue, Svelte, Pug, Haml, ERB, ASP.NET, JSP
+- **Data Formats**: JSON, XML, YAML, TOML, CSV, INI, Properties, HOCON, EDN
+- **Markup Languages**: Markdown, reStructuredText, AsciiDoc, Textile, MediaWiki, LaTeX, TeX, BibTeX
+- **Configuration Files**: INI, Properties, HOCON, TOML, YAML, JSON
+- **Scripting Languages**: Lua, Python, Ruby, Perl, PHP, Tcl, Awk, Sed
+- **System Languages**: C/C++, Rust, Go, Swift, Objective-C, Assembly
+- **Functional Languages**: Haskell, Scala, Clojure, Erlang, Elixir, F#, OCaml
+- **Scientific Languages**: R, Julia, MATLAB, Mathematica, Sage
+- **Database Languages**: SQL, PL/SQL, T-SQL, PostgreSQL, MySQL
+- **Build Systems**: Makefile, CMake, Ninja, Gradle, Maven, Ant
+- **And 200+ more languages and formats...**
 
 **Features:**
-- **Web Integration** - Handles embedded CSS/JS in HTML files
-- **Fast Parsing** - Regex-based highlighting for speed
-- **Data Format Support** - JSON with proper value type highlighting
-- **Theme Consistency** - Matches Tree-sitter color schemes
+- **High Performance** - Optimized rendering with minimal resource usage
+- **Smooth Operation** - No UI freezing or lag during editing
+- **Comprehensive Support** - Extensive language and format coverage
+- **Theme Integration** - Seamless integration with Loom's theme system
+- **Real-time Updates** - Instant color changes without restart
+- **Professional Quality** - Used by KDE applications worldwide
 
 ### Syntax Highlighting Configuration
 
-#### Tree-sitter Colors (`config/config.lua`)
+#### KSyntaxHighlighting Theme Configuration (`config/config.lua`)
 
-Customize syntax highlighting colors for programming languages:
+Configure syntax highlighting themes and colors:
 
 ```lua
--- Syntax highlighting colors for Tree-sitter highlighters
-syntax = {
-    -- Language constructs
-    keyword = "#fb4934",        -- Keywords (if, for, function, etc.)
-    control = "#fb4934",        -- Control flow (if, else, while, etc.)
-    type = "#fabd2f",          -- Types (int, string, class, etc.)
-    ["function"] = "#83a598",   -- Function names
-    constant = "#d3869b",       -- Constants (true, false, null, etc.)
-    builtin = "#458588",       -- Built-in functions/types
-
-    -- Data and literals
-    string = "#b8bb26",        -- String literals
-    number = "#d3869b",        -- Numeric literals
-    comment = "#928374",       -- Comments
-
-    -- Operators and punctuation
-    operator = "#fe8019",      -- Operators (+, -, *, /, etc.)
-    punctuation = "#ebdbb2",   -- Brackets, commas, semicolons
-
-    -- Special elements
-    preprocessor = "#8ec07c",  -- Preprocessor directives (#include, #define)
-    annotation = "#fabd2f",    -- Annotations/decorators
-    escape = "#fe8019"         -- Escape sequences in strings
+-- Theme settings with KSyntaxHighlighting integration
+theme = {
+    name = "gruvbox", -- Available: "gruvbox", "dracula", "catppuccin-mocha"
+    syntax_theme = "gruvbox Dark" -- KSyntaxHighlighting theme
+    -- Available themes: "Atom One Dark", "Atom One Light", "Breeze Dark", "Breeze Light",
+    --                   "Dracula", "Falcon", "GitHub Dark", "GitHub Light", "Monokai",
+    --                   "Nord", "Oblivion", "Printing", "Radical", "Solarized Dark",
+    --                   "Solarized Light", "Vim Dark", "ayu Dark", "ayu Light",
+    --                   "ayu Mirage", "gruvbox Dark", "gruvbox Light"
 }
 ```
 
-#### Basic Highlighter Colors (`config/config.lua`)
+#### Available KSyntaxHighlighting Themes
 
-Customize colors for web technologies and data formats:
+Loom supports all built-in KSyntaxHighlighting themes:
 
-```lua
--- Basic highlighter colors for HTML, CSS, JSON, and embedded content
-basic_highlighter = {
-    -- HTML-specific colors
-    tag = "#fb4934",           -- HTML tags (<div>, <p>, </body>)
-    attribute = "#fabd2f",     -- HTML attributes (class, id, href)
-    attribute_value = "#b8bb26", -- HTML attribute values ("value", 'value')
-    entity = "#fe8019",        -- HTML entities (&, <, >)
+**Dark Themes:**
+- `Breeze Dark` - KDE's default dark theme
+- `Dracula` - Popular dark theme with purple accents
+- `Monokai` - Classic dark theme
+- `Nord` - Arctic-inspired dark theme
+- `Solarized Dark` - Low-contrast dark theme
+- `Vim Dark` - Vim-inspired dark theme
+- `Atom One Dark` - Atom editor's dark theme
+- `GitHub Dark` - GitHub's dark theme
+- `gruvbox Dark` - Gruvbox dark variant
+- `ayu Dark` - Ayu dark theme
+- `ayu Mirage` - Ayu mirage variant
 
-    -- CSS-specific colors (standalone and embedded)
-    css_property = "#83a598",  -- CSS properties (color, background, margin)
-    css_value = "#d3869b",     -- CSS values (#fff, 20px, center)
-    css_selector = "#fabd2f",  -- CSS selectors (.class, #id, element)
+**Light Themes:**
+- `Breeze Light` - KDE's default light theme
+- `Solarized Light` - Low-contrast light theme
+- `Atom One Light` - Atom editor's light theme
+- `GitHub Light` - GitHub's light theme
+- `gruvbox Light` - Gruvbox light variant
+- `ayu Light` - Ayu light theme
 
-    -- JavaScript colors (embedded in HTML)
-    js_keyword = "#fb4934",    -- JS keywords (function, var, if, else)
-    js_string = "#b8bb26",     -- JS strings ("hello", 'world')
-    js_comment = "#928374",    -- JS comments (// comment, /* block */)
-    js_function = "#83a598",   -- JS function names
-
-    -- JSON-specific colors
-    json_key = "#fabd2f",      -- JSON object keys ("name", "version")
-    json_string = "#b8bb26",   -- JSON string values ("value")
-    json_number = "#d3869b",   -- JSON numbers (1, 2.5, 3.14)
-    json_boolean = "#fb4934",  -- JSON booleans (true, false)
-    json_null = "#fe8019"      -- JSON null values
-}
-```
+**Special Themes:**
+- `Printing` - High-contrast theme optimized for printing
+- `Oblivion` - High-contrast theme for accessibility
+- `Radical` - High-contrast theme
+- `Falcon` - Unique color scheme
 
 ### Color Customization Guide
 
@@ -230,10 +204,10 @@ Before building Loom, ensure you have the following installed:
 #### Linux (Ubuntu/Debian) - DEB Package (Recommended)
 ```bash
 # Download the latest DEB package from GitHub releases
-wget https://github.com/dexter-xd/loom/releases/download/beta_1.2.2/loom_1.2.2_amd64.deb
+wget https://github.com/dexter-xd/loom/releases/download/beta_1.2.5/loom_1.2.5_amd64.deb
 
 # Install the package
-sudo dpkg -i loom_1.2.2_amd64.deb
+sudo dpkg -i loom_1.2.5_amd64.deb
 sudo apt-get install -f  # Fix any dependency issues
 
 # Run Loom
@@ -780,30 +754,31 @@ loom/
 
 ### External Dependencies
 
-Loom uses **Tree-sitter** for advanced syntax highlighting. The Tree-sitter bindings and language grammars are included in the `external/` directory:
+Loom uses **KSyntaxHighlighting** from KDE Frameworks for professional-grade syntax highlighting. KSyntaxHighlighting is automatically included as a system dependency:
 
-- **tree-sitter/**: Core Tree-sitter library
-- **tree-sitter-*/**: Language-specific grammars for syntax highlighting
-- These are **development dependencies** and should be committed to version control
-- The `external/` folder is gitignored to avoid committing large binaries
+- **KF5SyntaxHighlighting**: KDE Frameworks syntax highlighting library
+- Provides 300+ language definitions and syntax highlighting themes
+- No additional setup required - installed via system package manager
+- Lightweight and optimized for performance
 
-#### Downloading Tree-sitter Dependencies
+#### Installing KSyntaxHighlighting
 
-For new development setups, use the provided script to download all Tree-sitter dependencies:
-
+**Ubuntu/Debian:**
 ```bash
-# Download all Tree-sitter language grammars
-chmod +x scripts/download_tree_sitter_deps.sh
-./scripts/download_tree_sitter_deps.sh
+sudo apt install libkf5syntaxhighlighting-dev
 ```
 
-This script will:
-- Download the Tree-sitter core library
-- Clone all supported language grammars (C, C++, Python, JavaScript, Rust, Java, Go, Lua)
-- Set up the `external/` directory structure
-- Provide clear progress feedback
+**Fedora/RHEL:**
+```bash
+sudo dnf install kf5-syntax-highlighting-devel
+```
 
-**Note:** The external dependencies are required for Tree-sitter syntax highlighting to work properly during development.
+**Arch Linux:**
+```bash
+sudo pacman -S syntax-highlighting
+```
+
+**Note:** KSyntaxHighlighting is a standard KDE Frameworks library and is typically available in most Linux distributions' package repositories.
 
 ### Debug Build
 
@@ -837,14 +812,16 @@ editor.debug_log("Debug message from Lua")
 Test your changes with the provided sample files in `test_files/`:
 
 ```bash
-# Test Tree-sitter highlighting
+# Test KSyntaxHighlighting for various languages
 ./scripts/run_loom.sh test_files/sample.cpp
 ./scripts/run_loom.sh test_files/sample.py
 ./scripts/run_loom.sh test_files/sample.js
-
-# Test basic highlighting
 ./scripts/run_loom.sh test_files/sample.html
 ./scripts/run_loom.sh test_files/sample.json
+./scripts/run_loom.sh test_files/sample.java
+./scripts/run_loom.sh test_files/sample.go
+./scripts/run_loom.sh test_files/sample.lua
+./scripts/run_loom.sh test_files/sample.md
 ./scripts/run_loom.sh test_files/style.css
 ```
 
@@ -900,6 +877,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Gruvbox** - Beautiful color scheme
 - **Qt Framework** - Cross-platform GUI toolkit
 - **Lua** - Powerful scripting language
+- **KSyntaxHighlighting** - Syntax highlighting framework from KDE
 - **Contributors** - Everyone who helps improve Loom
 
 ## Support

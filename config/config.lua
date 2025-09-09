@@ -16,7 +16,7 @@ config = {
     -- theme settings
     theme = {
         name = "gruvbox", -- available: "gruvbox", "dracula", "catppuccin-mocha"
-        syntax_theme = "gruvbox Dark" -- KSyntaxHighlighting theme
+        syntax_theme = "ayu Dark" -- KSyntaxHighlighting theme
         -- Available themes: "Atom One Dark", "Atom One Light", "Breeze Dark", "Breeze Light",
         --                   "Dracula", "Falcon", "GitHub Dark", "GitHub Light", "Monokai",
         --                   "Nord", "Oblivion", "Printing", "Radical", "Solarized Dark",
