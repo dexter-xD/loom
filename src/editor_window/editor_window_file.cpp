@@ -28,6 +28,10 @@ void EditorWindow::openFile(const QString &filePath)
         if (m_buffers[i]->filePath() == filePath) {
 
             m_tabWidget->setCurrentIndex(i);
+            CodeEditor* textEdit = m_textEditors[i];
+            if (textEdit) {
+                textEdit->setFocus();
+            }
             return;
         }
     }
@@ -53,6 +57,9 @@ void EditorWindow::openFile(const QString &filePath)
         m_tabWidget->setCurrentIndex(tabIndex);
 
         CodeEditor* textEdit = m_textEditors[tabIndex];
+        if (textEdit) {
+            textEdit->setFocus();
+        }
 
         disconnect(textEdit, &CodeEditor::textChanged, this, &EditorWindow::onTextChanged);
 
@@ -130,6 +137,10 @@ void EditorWindow::newFile()
 {
     int tabIndex = createNewTab();
     m_tabWidget->setCurrentIndex(tabIndex);
+    CodeEditor* textEdit = m_textEditors[tabIndex];
+    if (textEdit) {
+        textEdit->setFocus();
+    }
     updateWindowTitle();
     updateStatusBar();
 }
@@ -137,7 +148,12 @@ void EditorWindow::newFile()
 void EditorWindow::ensureAtLeastOneTab()
 {
     if (m_tabWidget->count() == 0) {
-        createNewTab();
+        int tabIndex = createNewTab();
+        m_tabWidget->setCurrentIndex(tabIndex);
+        CodeEditor* textEdit = m_textEditors[tabIndex];
+        if (textEdit) {
+            textEdit->setFocus();
+        }
     }
 }
 

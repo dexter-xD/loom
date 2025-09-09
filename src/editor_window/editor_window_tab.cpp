@@ -173,6 +173,11 @@ void EditorWindow::onTabChanged(int index)
     updateWindowTitle();
     updateStatusBar();
     updateLuaEditorState();
+
+    CodeEditor* textEdit = getCurrentTextEditor();
+    if (textEdit) {
+        textEdit->setFocus();
+    }
 }
 
 void EditorWindow::onTabCloseRequested(int index)
