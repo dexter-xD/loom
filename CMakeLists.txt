@@ -58,14 +58,6 @@ include_directories(include)
 set(RESOURCE_FILES themes/gruvbox.qss)
 qt5_add_resources(RESOURCES themes.qrc)
 
-# Removed Tree-sitter library builds - using custom syntax highlighter instead
-
-
-
-
-
-
-
 # create executable target
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
 
