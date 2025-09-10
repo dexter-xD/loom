@@ -1,6 +1,5 @@
 #include "editor_window.h"
 
-
 EditorWindow::EditorWindow(QWidget *parent)
     : QMainWindow(parent)
     , m_tabWidget(nullptr)
@@ -62,7 +61,6 @@ EditorWindow::~EditorWindow()
     m_buffers.clear();
 
     m_textEditors.clear();
-    m_syntaxHighlighters.clear();
 
     delete m_pluginManager;
     delete m_luaBridge;

@@ -1,8 +1,26 @@
 <RCC>
     <qresource prefix="/">
-        <file>themes/gruvbox.qss</file>
+        <file>themes/atom-one-dark.qss</file>
+        <file>themes/atom-one-light.qss</file>
+        <file>themes/ayu-dark.qss</file>
+        <file>themes/ayu-light.qss</file>
+        <file>themes/ayu-mirage.qss</file>
+        <file>themes/breeze-dark.qss</file>
+        <file>themes/breeze-light.qss</file>
         <file>themes/dracula.qss</file>
-        <file>themes/catppuccin-mocha.qss</file>
+        <file>themes/falcon.qss</file>
+        <file>themes/github-dark.qss</file>
+        <file>themes/github-light.qss</file>
+        <file>themes/gruvbox-dark.qss</file>
+        <file>themes/gruvbox-light.qss</file>
+        <file>themes/monokai.qss</file>
+        <file>themes/nord.qss</file>
+        <file>themes/oblivion.qss</file>
+        <file>themes/printing.qss</file>
+        <file>themes/radical.qss</file>
+        <file>themes/solarized-dark.qss</file>
+        <file>themes/solarized-light.qss</file>
+        <file>themes/vim-dark.qss</file>
         <file>assets/icon.png</file>
     </qresource>
 </RCC>

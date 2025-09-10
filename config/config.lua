@@ -12,19 +12,18 @@ config = {
         auto_indent = true,
         highlight_current_line = true
     },
-    
+
     -- theme settings
     theme = {
-        name = "gruvbox", -- available: "gruvbox", "dracula", "catppuccin-mocha"
-        syntax_theme = "ayu Dark" -- KSyntaxHighlighting theme
+        name = "gruvbox Dark" -- Single unified theme for both app UI and syntax highlighting
         -- Available themes: "Atom One Dark", "Atom One Light", "Breeze Dark", "Breeze Light",
         --                   "Dracula", "Falcon", "GitHub Dark", "GitHub Light", "Monokai",
         --                   "Nord", "Oblivion", "Printing", "Radical", "Solarized Dark",
         --                   "Solarized Light", "Vim Dark", "ayu Dark", "ayu Light",
         --                   "ayu Mirage", "gruvbox Dark", "gruvbox Light"
     },
-    
-    
+
+
     -- keybinding configuration
     keybindings = {
         ["Ctrl+S"] = "save_file",
@@ -48,7 +47,7 @@ config = {
         ["Ctrl+Shift+F"] = "format_document",
         ["F12"] = "toggle_file_tree"
     },
-    
+
     -- window settings
     window = {
         width = 1224,
@@ -56,14 +55,14 @@ config = {
         remember_size = true,
         remember_position = true
     },
-    
+
     -- plugin configuration
     plugins = {
         -- global plugin settings
         enabled = true,
         auto_load = true,
         error_recovery = true,
-        
+
         -- individual plugin settings
         autosave = {
             enabled = false,
@@ -71,12 +70,12 @@ config = {
             save_on_focus_lost = false,
             backup_files = false
         },
-        
+
         autoformat = {
             enabled = true,
             auto_load = true,
-            format_on_save = true,  -- enable format on save
-            use_external_formatters = true 
+            format_on_save = true, -- enable format on save
+            use_external_formatters = true
         },
         theme_switcher = {
             enabled = true,
@@ -93,7 +92,7 @@ function get_config(key, default_value)
     for k in string.gmatch(key, "([^%.]+)") do
         table.insert(keys, k)
     end
-    
+
     local value = config
     for _, k in ipairs(keys) do
         if type(value) == "table" and value[k] ~= nil then
@@ -102,7 +101,7 @@ function get_config(key, default_value)
             return default_value
         end
     end
-    
+
     return value
 end
 
@@ -112,7 +111,7 @@ function set_config(key, value)
     for k in string.gmatch(key, "([^%.]+)") do
         table.insert(keys, k)
     end
-    
+
     local current = config
     for i = 1, #keys - 1 do
         local k = keys[i]
@@ -121,7 +120,7 @@ function set_config(key, value)
         end
         current = current[k]
     end
-    
+
     current[keys[#keys]] = value
 end
 

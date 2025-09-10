@@ -9,11 +9,23 @@ void EditorWindow::setupUI()
     m_fileTreeWidget = new FileTreeWidget(this);
     m_fileTreeWidget->setVisible(false); 
 
-    m_tabWidget = new QTabWidget(this);
+    m_tabWidget = new NoMnemonicTabWidget(this);
     m_tabWidget->setTabsClosable(true);
     m_tabWidget->setMovable(true);
     m_tabWidget->setDocumentMode(true);
     m_tabWidget->setTabBarAutoHide(false);
+
+    QTabBar* tabBar = m_tabWidget->tabBar();
+    tabBar->setUsesScrollButtons(false);
+    tabBar->setElideMode(Qt::ElideRight);
+
+    m_tabWidget->setProperty("focusPolicy", Qt::NoFocus);
+
+    tabBar->setProperty("_q_paintWithoutMnemonics", true);
+    tabBar->setProperty("textFormat", Qt::PlainText);
+    m_tabWidget->setProperty("textFormat", Qt::PlainText);
+
+    tabBar->setFocusPolicy(Qt::NoFocus);
 
     m_mainSplitter->addWidget(m_fileTreeWidget);
     m_mainSplitter->addWidget(m_tabWidget);

@@ -4,9 +4,12 @@ void EditorWindow::setupSyntaxHighlighting()
 {
 
     for (int i = 0; i < m_textEditors.size(); ++i) {
-        setupSyntaxHighlightingForTab(i);
+        CodeEditor* editor = m_textEditors[i];
+        if (editor && m_luaBridge) {
+            QString syntaxTheme = m_luaBridge->getConfigString("theme.syntax_theme", "ayu Dark");
+            editor->setSyntaxTheme(syntaxTheme);
+        }
     }
-
 }
 
 void EditorWindow::detectAndSetLanguage(const QString &filePath)
@@ -23,19 +26,15 @@ void EditorWindow::detectAndSetLanguage(const QString &filePath)
     QString language = detectLanguageFromExtension(filePath);
     DEBUG_LOG_EDITOR("Detected language:" << language << "for file:" << filePath);
 
-    // Use KSyntaxHighlighter for all languages
-    if (currentIndex >= m_syntaxHighlighters.size()) {
+    CodeEditor* editor = getCurrentTextEditor();
+
+    if (!editor) {
         return;
     }
 
-    KSyntaxHighlighter* highlighter = m_syntaxHighlighters[currentIndex];
-    if (!highlighter) {
-        return;
-    }
+    editor->setLanguage(language);
 
-    highlighter->setLanguage(language);
-
-    DEBUG_LOG_EDITOR("Using KSyntaxHighlighter for tab" << currentIndex << "language:" << language);
+    DEBUG_LOG_EDITOR("Applied KTextEditor syntax highlighting for tab" << currentIndex << "language:" << language);
 }
 
 QString EditorWindow::detectLanguageFromExtension(const QString &filePath)
@@ -45,7 +44,7 @@ QString EditorWindow::detectLanguageFromExtension(const QString &filePath)
     QString fileName = fileInfo.fileName().toLower();
 
     static QMap<QString, QString> extensionMap = {
-        // C/C++
+
         {"cpp", "cpp"},
         {"cxx", "cpp"},
         {"cc", "cpp"},
@@ -56,10 +55,9 @@ QString EditorWindow::detectLanguageFromExtension(const QString &filePath)
         {"hxx", "cpp"},
         {"h++", "cpp"},
 
-        // Web languages
         {"js", "javascript"},
         {"jsx", "javascript"},
-        {"ts", "javascript"}, // TypeScript treated as JavaScript for now
+        {"ts", "javascript"}, 
         {"tsx", "javascript"},
         {"html", "html"},
         {"htm", "html"},
@@ -68,7 +66,6 @@ QString EditorWindow::detectLanguageFromExtension(const QString &filePath)
         {"sass", "css"},
         {"less", "css"},
 
-        // Other languages
         {"py", "python"},
         {"pyw", "python"},
         {"java", "java"},
@@ -84,7 +81,6 @@ QString EditorWindow::detectLanguageFromExtension(const QString &filePath)
         {"fish", "bash"},
         {"ps1", "powershell"},
 
-        // Data formats
         {"json", "json"},
         {"xml", "xml"},
         {"yaml", "yaml"},
@@ -94,18 +90,15 @@ QString EditorWindow::detectLanguageFromExtension(const QString &filePath)
         {"cfg", "ini"},
         {"conf", "ini"},
 
-        // Documentation
         {"md", "markdown"},
         {"markdown", "markdown"},
 
-        // Other
         {"txt", "text"},
         {"log", "text"}
     };
 
     QString language = extensionMap.value(extension, "text");
 
-    // Special file name detection
     if (language == "text") {
         if (fileName == "makefile" || fileName == "cmake" || fileName.startsWith("cmake")) {
             language = "cmake";
@@ -126,21 +119,20 @@ QString EditorWindow::detectLanguageFromExtension(const QString &filePath)
 void EditorWindow::setCurrentLanguage(const QString &language)
 {
     int currentIndex = getCurrentTabIndex();
-    if (currentIndex < 0 || currentIndex >= m_syntaxHighlighters.size()) {
+    if (currentIndex < 0 || currentIndex >= m_textEditors.size()) {
         m_statusBar->showMessage("No active tab to set language", 2000);
         return;
     }
 
-    KSyntaxHighlighter* highlighter = m_syntaxHighlighters[currentIndex];
-    if (!highlighter) {
-        m_statusBar->showMessage("No syntax highlighter available", 2000);
+    CodeEditor* editor = m_textEditors[currentIndex];
+    if (!editor) {
+        m_statusBar->showMessage("No editor available", 2000);
         return;
     }
 
     DEBUG_LOG_EDITOR("Setting language to:" << language << "for tab" << currentIndex);
 
-    highlighter->setLanguage(language);
-    highlighter->rehighlight();
+    editor->setLanguage(language);
 
     m_statusBar->showMessage(QString("Syntax highlighting set to: %1").arg(language.toUpper()), 3000);
 }

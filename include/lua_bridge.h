@@ -15,13 +15,8 @@ extern "C" {
 #include <lauxlib.h>
 }
 
-// forward declaration
-class KSyntaxHighlighter;
 class PluginManager;
 
-// interface between c++ editor and lua scripting engine
-// exposes editor functions to lua and handles lua callbacks
-// manages lua state and error handling
 class LuaBridge : public QObject
 {
     Q_OBJECT
@@ -65,8 +60,6 @@ public:
 
     void updateEditorState(const QString &text, int line, int column);
 
-    void setSyntaxHighlighter(KSyntaxHighlighter *highlighter);
-
     void loadSyntaxRulesForLanguage(const QString &language);
 
     void setPluginManager(PluginManager *pluginManager);
@@ -86,8 +79,6 @@ private:
 
     QString m_currentText;
     QPair<int, int> m_currentCursorPosition;
-
-    KSyntaxHighlighter *m_syntaxHighlighter;
 
     PluginManager *m_pluginManager;
 
@@ -117,13 +108,13 @@ private:
 
     static int lua_createTimer(lua_State *L);
     static int lua_stopTimer(lua_State *L);
-    
+
     static int lua_debugLog(lua_State *L);
 
     static int lua_listPlugins(lua_State *L);
     static int lua_isPluginLoaded(lua_State *L);
     static int lua_getPluginConfig(lua_State *L);
-    
+
     static int lua_setTheme(lua_State *L);
     static int lua_getTheme(lua_State *L);
     static int lua_toggleTheme(lua_State *L);

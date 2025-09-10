@@ -1,7 +1,3 @@
-// entry point
-// initializes qt application and creates main window
-// handles command line arguments and application lifecycle
-
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QMessageBox>
@@ -50,7 +46,7 @@ int main(int argc, char *argv[])
     if (!args.isEmpty()) {
         const QString path = args.first();
         QFileInfo pathInfo(path);
-        
+
         if (pathInfo.exists()) {
             if (pathInfo.isFile()) {
                 window.openFile(path);

@@ -1,8 +1,8 @@
-/* gruvbox theme stylesheet for Loom text editor */
-/* implements complete gruvbox color palette for consistent theming */
+/* gruvbox Dark theme stylesheet for Loom text editor */
+/* implements gruvbox Dark color palette for consistent theming */
 /* version -- 1.0.0 */
 
-/* gruvbox color palette */
+/* gruvbox Dark color palette */
 /* background colors */
 /* bg0_h: #1d2021, bg0: #282828, bg1: #3c3836, bg2: #504945 */
 /* bg3: #665c54, bg4: #7c6f64 */
@@ -80,8 +80,48 @@ QPlainTextEdit {
     border: none;
     selection-background-color: #504945;
     selection-color: #fbf1c7;
-    /* font settings removed - controlled by configuration system */
     line-height: 1.4;
+}
+
+/* KTextEditor widget styling */
+KTextEditor--View {
+    background-color: #282828;
+    color: #ebdbb2;
+    border: none;
+    selection-background-color: #504945;
+    selection-color: #fbf1c7;
+}
+
+KTextEditor--Document {
+    background-color: #282828;
+    color: #ebdbb2;
+}
+
+/* Remove borders from KTextEditor components */
+QWidget[class*="KTextEditor"] {
+    border: none;
+    background-color: #282828;
+    color: #ebdbb2;
+}
+
+/* Text edit widgets in general */
+QTextEdit {
+    background-color: #282828;
+    color: #ebdbb2;
+    border: none;
+    selection-background-color: #504945;
+    selection-color: #fbf1c7;
+}
+
+/* Remove any white borders from editor containers */
+QFrame {
+    border: none;
+    background-color: #282828;
+}
+
+QScrollArea {
+    border: none;
+    background-color: #282828;
 }
 
 /* status bar styling */
@@ -225,6 +265,8 @@ QTabBar {
     border: none;
     outline: none;
     qproperty-drawBase: 0;
+    qproperty-autoRaise: false;
+    qproperty-usesScrollButtons: false;
 }
 
 QTabBar::tab {

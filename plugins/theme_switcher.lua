@@ -15,11 +15,29 @@ local function is_plugin_enabled()
     return enabled and auto_load
 end
 
--- Available themes
+-- Available themes (all 21 themes)
 local available_themes = {
-    "gruvbox",
-    "dracula", 
-    "catppuccin-mocha"
+    "Vim Dark",
+    "Radical",
+    "Falcon",
+    "GitHub Dark",
+    "Oblivion",
+    "gruvbox Dark",
+    "Nord",
+    "Atom One Dark",
+    "Breeze Dark",
+    "Monokai",
+    "Dracula",
+    "ayu Dark",
+    "ayu Mirage",
+    "Solarized Dark",
+    "Printing",
+    "GitHub Light",
+    "Atom One Light",
+    "Breeze Light",
+    "ayu Light",
+    "gruvbox Light",
+    "Solarized Light"
 }
 
 -- Function to toggle/switch to next theme (main entry point)
@@ -28,7 +46,7 @@ function toggle_theme()
         editor.set_status_text("Theme switcher plugin is disabled")
         return
     end
-    
+
     switch_to_next_theme()
 end
 
@@ -38,11 +56,11 @@ function switch_to_next_theme()
         editor.set_status_text("Theme switcher plugin is disabled")
         return
     end
-    
+
     local current_theme = editor.get_theme()
     editor.debug_log("Current theme: " .. current_theme)
     local current_index = 1
-    
+
     -- Find current theme index
     for i, theme in ipairs(available_themes) do
         if theme == current_theme then
@@ -50,19 +68,19 @@ function switch_to_next_theme()
             break
         end
     end
-    
+
     editor.debug_log("Current theme index: " .. current_index)
-    
+
     -- Get next theme (wrap around)
     local next_index = (current_index % #available_themes) + 1
     local next_theme = available_themes[next_index]
-    
+
     editor.debug_log("Next theme: " .. next_theme .. " (index: " .. next_index .. ")")
-    
+
     -- Switch to next theme
     editor.set_theme(next_theme)
     editor.set_status_text("Switched to theme: " .. next_theme)
-    
+
     -- Verify the theme was actually changed
     local new_current_theme = editor.get_theme()
     editor.debug_log("Theme after switch: " .. new_current_theme)
@@ -74,7 +92,7 @@ function switch_to_theme(theme_name)
         editor.set_status_text("Theme switcher plugin is disabled")
         return
     end
-    
+
     -- Check if theme is available
     local theme_found = false
     for _, theme in ipairs(available_themes) do
@@ -83,7 +101,7 @@ function switch_to_theme(theme_name)
             break
         end
     end
-    
+
     if theme_found then
         editor.set_theme(theme_name)
         editor.set_status_text("Switched to theme: " .. theme_name)
@@ -98,7 +116,7 @@ function list_themes()
         editor.set_status_text("Theme switcher plugin is disabled")
         return
     end
-    
+
     local theme_list = "Available themes: " .. table.concat(available_themes, ", ")
     editor.set_status_text(theme_list)
 end
@@ -109,7 +127,7 @@ function get_current_theme()
         editor.set_status_text("Theme switcher plugin is disabled")
         return nil
     end
-    
+
     local current_theme = editor.get_theme()
     editor.set_status_text("Current theme: " .. current_theme)
     return current_theme

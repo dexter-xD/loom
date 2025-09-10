@@ -1,6 +1,5 @@
 #include "editor_window.h"
 
-
 int EditorWindow::createNewTab(const QString &title)
 {
 
@@ -11,29 +10,10 @@ int EditorWindow::createNewTab(const QString &title)
     m_textEditors.append(textEdit);
 
     if (m_luaBridge) {
-        QString currentTheme = m_luaBridge->getConfigString("theme.name", "gruvbox");
+        QString currentTheme = m_luaBridge->getConfigString("theme.name", "gruvbox Dark");
+        textEdit->applyCustomTheme(currentTheme);
 
-        QColor background, currentLine, normalLine;
-        if (currentTheme == "gruvbox") {
-            background = QColor(40, 37, 34);
-            currentLine = QColor(251, 241, 199);
-            normalLine = QColor(146, 131, 116);
-        } else if (currentTheme == "dracula") {
-            background = QColor(33, 34, 44);
-            currentLine = QColor(248, 248, 242);
-            normalLine = QColor(98, 114, 164);
-        } else if (currentTheme == "catppuccin-mocha") {
-            background = QColor(24, 24, 37);
-            currentLine = QColor(205, 214, 244);
-            normalLine = QColor(166, 173, 200);
-        } else {
-
-            background = QColor(40, 37, 34);
-            currentLine = QColor(251, 241, 199);
-            normalLine = QColor(146, 131, 116);
-        }
-
-        textEdit->setThemeColors(background, currentLine, normalLine);
+        textEdit->setSyntaxTheme(currentTheme);
     }
 
     if (m_luaBridge) {
@@ -49,7 +29,7 @@ int EditorWindow::createNewTab(const QString &title)
         font.setStyleHint(QFont::Monospace);
         textEdit->setFont(font);
         textEdit->setTabStopDistance(tabWidth * 10);
-        textEdit->setLineWrapMode(wordWrap ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap);
+        textEdit->setLineWrapMode(wordWrap ? CodeEditor::WidgetWidth : CodeEditor::NoWrap);
         textEdit->setLineNumbersVisible(showLineNumbers);
         textEdit->setAutoIndentEnabled(autoIndent);
         textEdit->setCurrentLineHighlightEnabled(highlightCurrentLine);
@@ -59,27 +39,18 @@ int EditorWindow::createNewTab(const QString &title)
         }
     }
 
-    KSyntaxHighlighter* highlighter = new KSyntaxHighlighter(textEdit->document());
-    m_syntaxHighlighters.append(highlighter);
+    textEdit->setLanguage("text");
 
-    if (m_luaBridge) {
-        highlighter->setLuaBridge(m_luaBridge);
-    }
+    DEBUG_LOG_EDITOR("Created KTextEditor-based tab" << (m_tabWidget->count() - 1) << "with language: text");
 
-    if (m_luaBridge) {
-        m_luaBridge->setSyntaxHighlighter(highlighter);
-    }
-
-    highlighter->setLanguage("text");
-
-    DEBUG_LOG_EDITOR("Created syntax highlighters for tab" << (m_tabWidget->count() - 1) << "with language: text");
-
-    connect(textEdit, &CodeEditor::textChanged, 
+    connect(textEdit, &CodeEditor::textChanged,
             this, &EditorWindow::onTextChanged);
     connect(textEdit, &CodeEditor::cursorPositionChanged,
             this, &EditorWindow::onCursorPositionChanged);
 
-    int tabIndex = m_tabWidget->addTab(textEdit, title);
+    QString escapedTitle = title;
+    escapedTitle.replace("&", "&&");
+    int tabIndex = m_tabWidget->addTab(textEdit, escapedTitle);
 
     DEBUG_LOG_EDITOR("Created new tab" << tabIndex << "with title:" << title);
 
@@ -95,7 +66,9 @@ void EditorWindow::updateTabTitle(int index)
     Buffer* buffer = m_buffers[index];
     QString title = buffer->fileName();
 
-    m_tabWidget->setTabText(index, title);
+    QString escapedTitle = title;
+    escapedTitle.replace("&", "&&");
+    m_tabWidget->setTabText(index, escapedTitle);
 }
 
 void EditorWindow::updateTabModificationIndicator(int index)
@@ -111,7 +84,9 @@ void EditorWindow::updateTabModificationIndicator(int index)
         title += " *";
     }
 
-    m_tabWidget->setTabText(index, title);
+    QString escapedTitle = title;
+    escapedTitle.replace("&", "&&");
+    m_tabWidget->setTabText(index, escapedTitle);
 }
 
 Buffer* EditorWindow::getCurrentBuffer()
@@ -132,15 +107,6 @@ CodeEditor* EditorWindow::getCurrentTextEditor()
     return nullptr;
 }
 
-KSyntaxHighlighter* EditorWindow::getCurrentSyntaxHighlighter()
-{
-    int currentIndex = m_tabWidget->currentIndex();
-    if (currentIndex >= 0 && currentIndex < m_syntaxHighlighters.size()) {
-        return m_syntaxHighlighters[currentIndex];
-    }
-    return nullptr;
-}
-
 int EditorWindow::getCurrentTabIndex()
 {
     return m_tabWidget->currentIndex();
@@ -148,20 +114,15 @@ int EditorWindow::getCurrentTabIndex()
 
 void EditorWindow::setupSyntaxHighlightingForTab(int index)
 {
-    if (index < 0 || index >= m_textEditors.size() || index >= m_syntaxHighlighters.size()) {
+    if (index < 0 || index >= m_textEditors.size()) {
         return;
     }
 
     CodeEditor* textEdit = m_textEditors[index];
-    KSyntaxHighlighter* highlighter = m_syntaxHighlighters[index];
 
-    if (!textEdit || !highlighter) {
+    if (!textEdit) {
         DEBUG_LOG_EDITOR("Cannot setup syntax highlighting for tab" << index << ": missing components");
         return;
-    }
-
-    if (m_luaBridge) {
-        m_luaBridge->setSyntaxHighlighter(highlighter);
     }
 
 }
@@ -202,7 +163,7 @@ void EditorWindow::onTabCloseRequested(int index)
             if (buffer->filePath().isEmpty()) {
 
                 QString filePath = QFileDialog::getSaveFileName(this,
-                    "Save File", QString(), 
+                    "Save File", QString(),
                     "All Files (*);;"
                     "Text Files (*.txt);;"
                     "C/C++ Files (*.c *.cpp *.cxx *.cc *.h *.hpp *.hxx);;"
@@ -218,7 +179,7 @@ void EditorWindow::onTabCloseRequested(int index)
                     "Configuration Files (*.conf *.config *.ini *.cfg)");
 
                 if (filePath.isEmpty()) {
-                    return; 
+                    return;
                 }
 
                 if (!buffer->save(filePath)) {
@@ -232,7 +193,7 @@ void EditorWindow::onTabCloseRequested(int index)
                 }
             }
         } else if (reply == QMessageBox::Cancel) {
-            return; 
+            return;
         }
 
     }
@@ -252,7 +213,6 @@ void EditorWindow::closeFile(int index)
     m_buffers.removeAt(index);
 
     m_textEditors.removeAt(index);
-    m_syntaxHighlighters.removeAt(index);
 
     if (m_tabWidget->count() == 0) {
         createNewTab();

@@ -368,7 +368,7 @@ void EditorWindow::applyConfiguration()
     }
 
     bool wordWrap = m_luaBridge->getConfigBool("editor.word_wrap", false);
-    QPlainTextEdit::LineWrapMode wrapMode = wordWrap ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap;
+    CodeEditor::LineWrapMode wrapMode = wordWrap ? CodeEditor::WidgetWidth : CodeEditor::NoWrap;
 
     for (CodeEditor* textEdit : m_textEditors) {
         textEdit->setLineWrapMode(wrapMode);

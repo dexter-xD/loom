@@ -1,0 +1,391 @@
+/* Radical theme stylesheet for Loom text editor */
+/* implements Radical color palette for vibrant dark theming */
+/* version -- 1.0.0 */
+
+/* Radical color palette */
+/* background colors */
+/* bg0: #0d1117, bg1: #161b22, bg2: #21262d, bg3: #30363d */
+/* bg4: #484f58, bg5: #6e7681 */
+
+/* foreground colors */
+/* fg0: #f0f6fc, fg1: #e6edf3, fg2: #7d8590, fg3: #656d76 */
+
+/* accent colors */
+/* red: #ff6b9d, green: #39ff14, yellow: #ffff00, blue: #00d4ff */
+/* purple: #da70d6, orange: #ff6600, cyan: #00ffff, pink: #ff1493 */
+
+/* bright colors */
+/* bright_red: #ff8fa3, bright_green: #5fff3d, bright_yellow: #ffff66 */
+/* bright_blue: #33ddff, bright_purple: #dda0dd, bright_cyan: #66ffff */
+
+/* main window styling */
+QMainWindow {
+    background-color: #0d1117;
+    color: #f0f6fc;
+}
+
+/* menu bar styling */
+QMenuBar {
+    background-color: #161b22;
+    color: #f0f6fc;
+    border-bottom: 1px solid #21262d;
+    padding: 2px;
+}
+
+QMenuBar::item {
+    background-color: transparent;
+    padding: 4px 8px;
+    margin: 2px;
+    border-radius: 3px;
+}
+
+QMenuBar::item:selected {
+    background-color: #21262d;
+    color: #00ffff;
+}
+
+QMenuBar::item:pressed {
+    background-color: #30363d;
+}
+
+/* menu styling */
+QMenu {
+    background-color: #161b22;
+    color: #f0f6fc;
+    border: 1px solid #21262d;
+    padding: 4px;
+}
+
+QMenu::item {
+    padding: 6px 20px;
+    border-radius: 3px;
+}
+
+QMenu::item:selected {
+    background-color: #21262d;
+    color: #00ffff;
+}
+
+QMenu::separator {
+    height: 1px;
+    background-color: #21262d;
+    margin: 4px 0px;
+}
+
+/* text editor styling */
+QPlainTextEdit {
+    background-color: #0d1117;
+    color: #f0f6fc;
+    border: none;
+    selection-background-color: #30363d;
+    selection-color: #00ffff;
+    line-height: 1.4;
+}
+
+/* KTextEditor widget styling */
+KTextEditor--View {
+    background-color: #0d1117;
+    color: #f0f6fc;
+    border: none;
+    selection-background-color: #30363d;
+    selection-color: #00ffff;
+}
+
+KTextEditor--Document {
+    background-color: #0d1117;
+    color: #f0f6fc;
+}
+
+/* Remove borders from KTextEditor components */
+QWidget[class*="KTextEditor"] {
+    border: none;
+    background-color: #0d1117;
+    color: #f0f6fc;
+}
+
+/* Text edit widgets in general */
+QTextEdit {
+    background-color: #0d1117;
+    color: #f0f6fc;
+    border: none;
+    selection-background-color: #30363d;
+    selection-color: #00ffff;
+}
+
+/* Remove any white borders from editor containers */
+QFrame {
+    border: none;
+    background-color: #0d1117;
+}
+
+QScrollArea {
+    border: none;
+    background-color: #0d1117;
+}
+
+/* status bar styling */
+QStatusBar {
+    background-color: #161b22;
+    color: #f0f6fc;
+    border-top: 1px solid #21262d;
+    padding: 2px;
+}
+
+QStatusBar::item {
+    border: none;
+}
+
+/* dialog styling */
+QDialog {
+    background-color: #0d1117;
+    color: #f0f6fc;
+}
+
+QLabel {
+    color: #f0f6fc;
+}
+
+/* file dialog styling */
+QFileDialog {
+    background-color: #0d1117;
+    color: #f0f6fc;
+}
+
+QFileDialog QListView {
+    background-color: #161b22;
+    color: #f0f6fc;
+    selection-background-color: #21262d;
+    selection-color: #00ffff;
+}
+
+QFileDialog QTreeView {
+    background-color: #161b22;
+    color: #f0f6fc;
+    selection-background-color: #21262d;
+    selection-color: #00ffff;
+}
+
+/* button styling */
+QPushButton {
+    background-color: #21262d;
+    color: #f0f6fc;
+    border: 1px solid #30363d;
+    padding: 6px 12px;
+    border-radius: 3px;
+    min-width: 60px;
+}
+
+QPushButton:hover {
+    background-color: #30363d;
+    color: #00ffff;
+    border-color: #00d4ff;
+}
+
+QPushButton:pressed {
+    background-color: #484f58;
+}
+
+QPushButton:default {
+    background-color: #ff6b9d;
+    color: #ffffff;
+    border-color: #ff8fa3;
+}
+
+QPushButton:default:hover {
+    background-color: #ff8fa3;
+}
+
+/* line edit styling */
+QLineEdit {
+    background-color: #161b22;
+    color: #f0f6fc;
+    border: 1px solid #21262d;
+    padding: 4px;
+    border-radius: 3px;
+    selection-background-color: #30363d;
+    selection-color: #00ffff;
+}
+
+QLineEdit:focus {
+    border-color: #00d4ff;
+    background-color: #1a1f26;
+}
+
+/* combo box styling */
+QComboBox {
+    background-color: #161b22;
+    color: #f0f6fc;
+    border: 1px solid #21262d;
+    padding: 4px;
+    border-radius: 3px;
+}
+
+QComboBox:hover {
+    border-color: #30363d;
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 20px;
+}
+
+QComboBox::down-arrow {
+    image: none;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #f0f6fc;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #161b22;
+    color: #f0f6fc;
+    selection-background-color: #21262d;
+    selection-color: #00ffff;
+    border: 1px solid #21262d;
+}
+
+/* tab widget styling - modern neon design */
+QTabWidget {
+    background-color: #0d1117;
+    border: none;
+}
+
+QTabWidget::pane {
+    background-color: #0d1117;
+    border: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+QTabWidget::tab-bar {
+    alignment: left;
+}
+
+/* tab bar styling - neon look */
+QTabBar {
+    background-color: #161b22;
+    border: none;
+    outline: none;
+    qproperty-drawBase: 0;
+}
+
+QTabBar::tab {
+    background-color: #161b22;
+    color: #7d8590;
+    padding: 10px 20px;
+    margin: 0px;
+    border: none;
+    min-width: 100px;
+    max-height: 32px;
+}
+
+QTabBar::tab:selected {
+    background-color: #0d1117;
+    color: #00ffff;
+    border-bottom: 2px solid #ff6b9d;
+}
+
+QTabBar::tab:hover:!selected {
+    background-color: #21262d;
+    color: #da70d6;
+}
+
+QTabBar::tab:first {
+    margin-left: 0px;
+}
+
+QTabBar::tab:last {
+    margin-right: 0px;
+}
+
+/* close button - neon circular design */
+QTabBar::close-button {
+    background-color: rgba(33, 38, 45, 0.6);
+    border: none;
+    padding: 0px;
+    margin: 0px 6px 0px 8px;
+    width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    subcontrol-position: right;
+}
+
+QTabBar::close-button:hover {
+    background-color: #ff6b9d;
+    border-radius: 9px;
+    box-shadow: 0 0 10px #ff6b9d;
+}
+
+QTabBar::close-button:pressed {
+    background-color: #ff8fa3;
+    border-radius: 9px;
+    box-shadow: 0 0 15px #ff8fa3;
+}
+
+/* Better visibility on selected tabs */
+QTabBar::tab:selected QTabBar::close-button {
+    background-color: rgba(48, 54, 61, 0.8);
+}
+
+QTabBar QToolButton {
+    background-color: transparent;
+    border: none;
+    color: #7d8590;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+QTabBar QToolButton:hover {
+    color: #00ffff;
+}
+
+/* scroll bar styling - neon glow */
+QScrollBar:vertical {
+    background-color: #161b22;
+    width: 12px;
+    border-radius: 6px;
+    border: 1px solid #21262d;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #30363d;
+    border-radius: 6px;
+    min-height: 20px;
+    border: 1px solid #484f58;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #484f58;
+    border-color: #00d4ff;
+    box-shadow: 0 0 5px #00d4ff;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QScrollBar:horizontal {
+    background-color: #161b22;
+    height: 12px;
+    border-radius: 6px;
+    border: 1px solid #21262d;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: #30363d;
+    border-radius: 6px;
+    min-width: 20px;
+    border: 1px solid #484f58;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background-color: #484f58;
+    border-color: #00d4ff;
+    box-shadow: 0 0 5px #00d4ff;
+}
+
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    width: 0px;
+}

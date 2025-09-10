@@ -1,64 +1,112 @@
 #ifndef CODE_EDITOR_H
 #define CODE_EDITOR_H
 
-#include <QPlainTextEdit>
-#include <QObject>
-#include <QColor>
+#include <QtWidgets/QWidget>
+#include <QtCore/QObject>
+#include <QtGui/QColor>
+#include <QtWidgets/QVBoxLayout>
+#include <QtGui/QFont>
+#include <QtCore/QString>
+#include <QtGui/QTextDocument>
+#include <QtGui/QTextCursor>
+#include <QtGui/QResizeEvent>
+#include <QtGui/QPaintEvent>
+#include <KTextEditor/Editor>
+#include <KTextEditor/Document>
+#include <KTextEditor/View>
+#include <KTextEditor/ConfigInterface>
+#include <KSyntaxHighlighting/Repository>
+#include <KSyntaxHighlighting/Theme>
 
-QT_BEGIN_NAMESPACE
-class QPaintEvent;
-class QResizeEvent;
-class QSize;
-class QWidget;
-QT_END_NAMESPACE
-
-class LineNumberArea;
-
-class CodeEditor : public QPlainTextEdit
+class CodeEditor : public QWidget
 {
     Q_OBJECT
 
 public:
     CodeEditor(QWidget *parent = nullptr);
+    ~CodeEditor();
 
-    void lineNumberAreaPaintEvent(QPaintEvent *event);
-    int lineNumberAreaWidth();
-    
+    QString toPlainText() const;
+    void setPlainText(const QString &text);
+    void insertPlainText(const QString &text);
+
+    QTextDocument* document() const;
+    QTextCursor textCursor() const;
+    void setTextCursor(const QTextCursor &cursor);
+
+    void setFont(const QFont &font);
+    QFont font() const;
+    void setTabStopDistance(int distance);
+
+    enum LineWrapMode { NoWrap, WidgetWidth };
+    void setLineWrapMode(LineWrapMode mode);
+
+    void setFocus();
+    bool isReadOnly() const;
+    void setReadOnly(bool readOnly);
+
     void setRelativeLineNumbers(bool enabled) { m_relativeLineNumbers = enabled; }
     bool relativeLineNumbers() const { return m_relativeLineNumbers; }
-    
+
     void setLineNumbersVisible(bool visible);
-    bool lineNumbersVisible() const { return m_lineNumbersVisible; }
-    
-    void setAutoIndentEnabled(bool enabled) { m_autoIndentEnabled = enabled; }
+    bool lineNumbersVisible() const;
+
+    void setAutoIndentEnabled(bool enabled);
     bool autoIndentEnabled() const { return m_autoIndentEnabled; }
-    
+
     void setCurrentLineHighlightEnabled(bool enabled);
     bool currentLineHighlightEnabled() const { return m_currentLineHighlightEnabled; }
-    
+
     void setThemeColors(const QColor &background, const QColor &currentLine, const QColor &normalLine);
     void updateThemeColors();
-    
+
+    KTextEditor::View* view() const { return m_view; }
+    KTextEditor::Document* ktextDocument() const { return m_document; }
+
+    void applyCustomTheme(const QString& themeName);
+
+    void setSyntaxTheme(const QString& syntaxTheme);
+    void setLanguage(const QString& language);
+    void applyBuiltinSyntaxHighlighting();
+
+    void undo();
+    void redo();
+    void cut();
+    void copy();
+    void paste();
+    void selectAll();
+
+signals:
+    void textChanged();
+    void cursorPositionChanged();
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
-    void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
-    void updateLineNumberAreaWidth(int newBlockCount);
-    void highlightCurrentLine();
-    void updateLineNumberArea(const QRect &rect, int dy);
+    void onTextChanged();
+    void onCursorPositionChanged();
 
 private:
-    QWidget *lineNumberArea;
+
+    KTextEditor::Editor* m_editor;
+    KTextEditor::Document* m_document;
+    KTextEditor::View* m_view;
+
+    QVBoxLayout* m_layout;
+
     bool m_relativeLineNumbers;
-    bool m_lineNumbersVisible;
     bool m_autoIndentEnabled;
     bool m_currentLineHighlightEnabled;
-    
-    // Theme colors for line numbers
+
     QColor m_lineNumberBackground;
     QColor m_lineNumberCurrentLine;
     QColor m_lineNumberNormal;
+
+    void setupEditor();
+    void setupConnections();
+    void configureEditor();
+    void applyEditorSettings();
 };
 
-#endif 
+#endif

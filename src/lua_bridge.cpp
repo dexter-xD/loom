@@ -1,5 +1,5 @@
 #include "lua_bridge.h"
-#include "ksyntax_highlighter.h"
+
 #include "plugin_manager.h"
 #include "debug_log.h"
 #include <QDir>
@@ -12,7 +12,6 @@ LuaBridge::LuaBridge(QObject *parent)
     : QObject(parent)
     , m_lua(nullptr)
     , m_currentCursorPosition(1, 1)
-    , m_syntaxHighlighter(nullptr)
     , m_pluginManager(nullptr)
     , m_nextTimerId(1)
 {
@@ -142,6 +141,8 @@ void LuaBridge::registerEditorAPI()
     registerFunction("get_theme", lua_getTheme);
     registerFunction("toggle_theme", lua_toggleTheme);
 
+    lua_setglobal(m_lua, "editor");
+
     lua_newtable(m_lua);
     lua_pushcfunction(m_lua, lua_registerEventHandler);
     lua_setfield(m_lua, -2, "connect");
@@ -162,8 +163,6 @@ void LuaBridge::registerEditorAPI()
     lua_pushcfunction(m_lua, lua_getPluginConfig);
     lua_setfield(m_lua, -2, "get_config");
     lua_setglobal(m_lua, "plugins");
-
-    lua_setglobal(m_lua, "editor");
 
 }
 
@@ -240,7 +239,7 @@ void LuaBridge::setupLuaPath()
     QString appDir = QCoreApplication::applicationDirPath();
     QString configDir = appDir + "/config";
     QString pluginDir = appDir + "/plugins";
-    
+
     QString systemConfigDir = "/usr/share/loom/config";
     QString systemPluginDir = "/usr/share/loom/plugins";
 
@@ -747,12 +746,6 @@ bool LuaBridge::executeFile(const QString &filePath)
     return true;
 }
 
-void LuaBridge::setSyntaxHighlighter(KSyntaxHighlighter *highlighter)
-{
-    m_syntaxHighlighter = highlighter;
-
-}
-
 void LuaBridge::setPluginManager(PluginManager *pluginManager)
 {
     m_pluginManager = pluginManager;
@@ -761,25 +754,16 @@ void LuaBridge::setPluginManager(PluginManager *pluginManager)
 
 void LuaBridge::loadSyntaxRulesForLanguage(const QString &language)
 {
-    if (!m_syntaxHighlighter) {
-        DEBUG_LOG_LUA("No syntax highlighter set, cannot load rules for language:" << language);
-        return;
-    }
 
+    DEBUG_LOG_LUA("Language set to:" << language << "(handled by KTextEditor)");
 }
 
 int LuaBridge::lua_addSyntaxRule(lua_State *L)
 {
-    if (!g_bridge || !g_bridge->m_syntaxHighlighter) {
-        lua_pushstring(L, "No syntax highlighter available");
-        lua_error(L);
-        return 0;
-    }
 
-    const char *pattern = luaL_checkstring(L, 1);
-    const char *colorName = luaL_checkstring(L, 2);
-
-    g_bridge->m_syntaxHighlighter->addRule(QString::fromUtf8(pattern), QString::fromUtf8(colorName));
+    lua_pushstring(L, "Custom syntax rules not supported - KTextEditor handles syntax highlighting");
+    lua_error(L);
+    return 0;
 
     return 0;
 }
@@ -788,13 +772,7 @@ int LuaBridge::lua_clearSyntaxRules(lua_State *L)
 {
     Q_UNUSED(L)
 
-    if (!g_bridge || !g_bridge->m_syntaxHighlighter) {
-        lua_pushstring(L, "No syntax highlighter available");
-        lua_error(L);
-        return 0;
-    }
-
-    g_bridge->m_syntaxHighlighter->clearRules();
+    DEBUG_LOG_LUA("Clear syntax rules called - KTextEditor manages highlighting internally");
 
     return 0;
 }
@@ -1068,11 +1046,11 @@ int LuaBridge::lua_setTheme(lua_State *L)
 int LuaBridge::lua_getTheme(lua_State *L)
 {
     if (!g_bridge) {
-        lua_pushstring(L, "gruvbox"); 
+        lua_pushstring(L, "gruvbox Dark"); 
         return 1;
     }
 
-    QString currentTheme = g_bridge->getConfigString("theme.name", "gruvbox");
+    QString currentTheme = g_bridge->getConfigString("theme.name", "gruvbox Dark");
     lua_pushstring(L, currentTheme.toUtf8().constData());
 
     return 1;
@@ -1080,6 +1058,8 @@ int LuaBridge::lua_getTheme(lua_State *L)
 
 int LuaBridge::lua_toggleTheme(lua_State *L)
 {
+    Q_UNUSED(L)
+
     if (!g_bridge) {
         return 0;
     }

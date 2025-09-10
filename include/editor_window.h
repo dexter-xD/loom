@@ -1,7 +1,3 @@
-// main window class containing all ui elements
-// manages central editor widget, status bar, and menu system
-// coordinates between ui components and editor core
-
 #ifndef EDITOR_WINDOW_H
 #define EDITOR_WINDOW_H
 
@@ -28,13 +24,49 @@
 #include <QTimer>
 #include <QKeyEvent>
 #include <QSplitter>
+#include <QTabBar>
+#include <QPainter>
+#include <QStyleOptionTab>
 #include "buffer.h"
 #include "lua_bridge.h"
 #include "debug_log.h"
-#include "ksyntax_highlighter.h"
 #include "plugin_manager.h"
 #include "code_editor.h"
 #include "file_tree_widget.h"
+
+class NoMnemonicTabBar : public QTabBar
+{
+    Q_OBJECT
+
+public:
+    explicit NoMnemonicTabBar(QWidget* parent = nullptr) : QTabBar(parent) {}
+
+protected:
+    void paintEvent(QPaintEvent*) override {
+
+        QPainter painter(this);
+        QStyleOptionTab option;
+
+        for (int i = 0; i < count(); ++i) {
+            initStyleOption(&option, i);
+
+            QString originalText = option.text;
+            option.text = originalText.remove('&');
+            style()->drawControl(QStyle::CE_TabBarTab, &option, &painter, this);
+        }
+    }
+};
+
+class NoMnemonicTabWidget : public QTabWidget
+{
+    Q_OBJECT
+
+public:
+    explicit NoMnemonicTabWidget(QWidget* parent = nullptr) : QTabWidget(parent) {
+
+        setTabBar(new NoMnemonicTabBar(this));
+    }
+};
 
 class EditorWindow : public QMainWindow
 {
@@ -101,12 +133,11 @@ private slots:
 
 private:
 
-    QTabWidget *m_tabWidget;
+    NoMnemonicTabWidget* m_tabWidget;
     QStatusBar *m_statusBar;
 
     QList<Buffer*> m_buffers;
     QList<CodeEditor*> m_textEditors;
-    QList<KSyntaxHighlighter*> m_syntaxHighlighters;
 
     LuaBridge *m_luaBridge;
 
@@ -114,7 +145,6 @@ private:
 
     QMap<QString, QShortcut*> m_shortcuts;
 
-    // File tree widget
     QSplitter *m_mainSplitter;
     FileTreeWidget *m_fileTreeWidget;
 
@@ -132,7 +162,6 @@ private:
     void updateTabModificationIndicator(int index);
     Buffer* getCurrentBuffer();
     CodeEditor* getCurrentTextEditor();
-    KSyntaxHighlighter* getCurrentSyntaxHighlighter();
     int getCurrentTabIndex();
 
     void setupSyntaxHighlighting();
@@ -146,7 +175,7 @@ private:
     void replaceText(const QString &searchText, const QString &replaceText, bool replaceAll = false);
 
     void setCurrentLanguage(const QString &language);
-    
+
     void loadTheme(const QString &themeName);
     void applyTheme();
     void updateEditorThemeColors(const QString &themeName);

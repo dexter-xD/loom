@@ -21,6 +21,7 @@ endif()
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
 find_package(Lua REQUIRED)
 find_package(KF5SyntaxHighlighting REQUIRED)
+find_package(KF5TextEditor REQUIRED)
 
 # enable qt moc for Qt5
 set(CMAKE_AUTOMOC ON)
@@ -35,9 +36,7 @@ set(SOURCES
     src/lua_bridge.cpp
     src/plugin_manager.cpp
     src/code_editor.cpp
-    src/line_number_area.cpp
     src/file_tree_widget.cpp
-    src/ksyntax_highlighter.cpp
 )
 
 # header files (needed for MOC processing)
@@ -47,9 +46,7 @@ set(HEADERS
     include/lua_bridge.h
     include/plugin_manager.h
     include/code_editor.h
-    include/line_number_area.h
     include/file_tree_widget.h
-    include/ksyntax_highlighter.h
 )
 
 include_directories(include)
@@ -67,6 +64,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Widgets
     ${LUA_LIBRARIES}
     KF5::SyntaxHighlighting
+    KF5::TextEditor
 )
 
 # include directories
@@ -92,18 +90,18 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 
 # Install config and plugins directories with proper permissions
-install(DIRECTORY config/ 
+install(DIRECTORY config/
     DESTINATION share/${PROJECT_NAME}/config
     FILES_MATCHING PATTERN "*.lua"
     PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
 
-install(DIRECTORY plugins/ 
+install(DIRECTORY plugins/
     DESTINATION share/${PROJECT_NAME}/plugins
     FILES_MATCHING PATTERN "*.lua"
     PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
 
 # Install themes directory
-install(DIRECTORY themes/ 
+install(DIRECTORY themes/
     DESTINATION share/${PROJECT_NAME}/themes
     FILES_MATCHING PATTERN "*.qss"
     PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
