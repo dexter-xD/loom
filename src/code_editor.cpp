@@ -85,6 +85,20 @@ void CodeEditor::configureEditor()
 
         config->setConfigValue(QStringLiteral("show-tabs"), false);
         config->setConfigValue(QStringLiteral("show-trailing-spaces"), false);
+        
+        // Disable minimap and scroll annotations for cleaner appearance
+        config->setConfigValue(QStringLiteral("scrollbar-minimap"), false);
+        config->setConfigValue(QStringLiteral("scrollbar-preview"), false);
+        config->setConfigValue(QStringLiteral("scrollbar-mini-map"), false);
+        config->setConfigValue(QStringLiteral("minimap"), false);
+        config->setConfigValue(QStringLiteral("scroll-bar-marks"), false);
+        config->setConfigValue(QStringLiteral("scroll-bar-mini-map"), false);
+        
+        // Improve visual appearance
+        config->setConfigValue(QStringLiteral("animate-bracket-matching"), true);
+        config->setConfigValue(QStringLiteral("word-completion"), true);
+        config->setConfigValue(QStringLiteral("enable-text-hints"), false);
+        config->setConfigValue(QStringLiteral("text-folding"), false);
     }
 
     applyBuiltinSyntaxHighlighting();
@@ -96,6 +110,45 @@ void CodeEditor::applyEditorSettings()
     if (!m_view) return;
 
     m_view->setStatusBarEnabled(false);
+    
+    // Configure modern scroll area and interface appearance
+    if (auto config = qobject_cast<KTextEditor::ConfigInterface*>(m_view)) {
+        // Smooth scrolling and modern appearance
+        config->setConfigValue(QStringLiteral("scroll-past-end"), true);
+        config->setConfigValue(QStringLiteral("auto-center-lines"), 3);
+        config->setConfigValue(QStringLiteral("backup-on-save-suffix"), QString());
+        
+        // Disable distracting visual elements
+        config->setConfigValue(QStringLiteral("icon-border"), false);
+        config->setConfigValue(QStringLiteral("folding-bar"), false);
+        config->setConfigValue(QStringLiteral("modification-markers"), false);
+        config->setConfigValue(QStringLiteral("line-modification"), false);
+        config->setConfigValue(QStringLiteral("bookmark-sorting"), 0);
+        
+        // Clean interface
+        config->setConfigValue(QStringLiteral("border"), false);
+        config->setConfigValue(QStringLiteral("scrollbar-mini-map-all"), false);
+        config->setConfigValue(QStringLiteral("scrollbar-mini-map-width"), 0);
+    }
+    
+    // Apply additional widget-level styling for clean scroll appearance
+    if (m_view) {
+        m_view->setStyleSheet(
+            "QScrollBar:vertical {"
+            "    background: transparent;"
+            "    width: 8px;"
+            "    border-radius: 4px;"
+            "}"
+            "QScrollBar::handle:vertical {"
+            "    background: rgba(128, 128, 128, 0.5);"
+            "    border-radius: 4px;"
+            "    min-height: 30px;"
+            "}"
+            "QScrollBar::handle:vertical:hover {"
+            "    background: rgba(128, 128, 128, 0.7);"
+            "}"
+        );
+    }
 }
 
 void CodeEditor::applyBuiltinSyntaxHighlighting()

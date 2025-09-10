@@ -339,53 +339,98 @@ QTabBar QToolButton:hover {
     color: #00ffff;
 }
 
-/* scroll bar styling - neon glow */
+/* scroll bar styling - modern and smooth */
 QScrollBar:vertical {
-    background-color: #161b22;
-    width: 12px;
-    border-radius: 6px;
-    border: 1px solid #21262d;
+    background-color: transparent;
+    width: 8px;
+    border-radius: 4px;
+    margin: 2px;
 }
 
 QScrollBar::handle:vertical {
-    background-color: #30363d;
-    border-radius: 6px;
-    min-height: 20px;
-    border: 1px solid #484f58;
+    background-color: rgba(48, 54, 61, 0.7);
+    border-radius: 4px;
+    min-height: 30px;
+    margin: 0px;
 }
 
 QScrollBar::handle:vertical:hover {
-    background-color: #484f58;
-    border-color: #00d4ff;
-    box-shadow: 0 0 5px #00d4ff;
+    background-color: rgba(0, 212, 255, 0.9);
+}
+
+QScrollBar::handle:vertical:pressed {
+    background-color: rgba(0, 212, 255, 1.0);
 }
 
 QScrollBar::add-line:vertical,
 QScrollBar::sub-line:vertical {
     height: 0px;
+    border: none;
+    background: none;
+}
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: none;
 }
 
 QScrollBar:horizontal {
-    background-color: #161b22;
-    height: 12px;
-    border-radius: 6px;
-    border: 1px solid #21262d;
+    background-color: transparent;
+    height: 8px;
+    border-radius: 4px;
+    margin: 2px;
 }
 
 QScrollBar::handle:horizontal {
-    background-color: #30363d;
-    border-radius: 6px;
-    min-width: 20px;
-    border: 1px solid #484f58;
+    background-color: rgba(48, 54, 61, 0.7);
+    border-radius: 4px;
+    min-width: 30px;
+    margin: 0px;
 }
 
 QScrollBar::handle:horizontal:hover {
-    background-color: #484f58;
-    border-color: #00d4ff;
-    box-shadow: 0 0 5px #00d4ff;
+    background-color: rgba(0, 212, 255, 0.9);
+}
+
+QScrollBar::handle:horizontal:pressed {
+    background-color: rgba(0, 212, 255, 1.0);
 }
 
 QScrollBar::add-line:horizontal,
 QScrollBar::sub-line:horizontal {
     width: 0px;
+    border: none;
+    background: none;
+}
+
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+/* KTextEditor specific scroll area styling */
+QScrollArea {
+    border: none;
+    background-color: transparent;
+}
+
+QAbstractScrollArea {
+    border: none;
+    background-color: transparent;
+}
+
+QAbstractScrollArea QScrollBar:vertical {
+    background-color: transparent;
+    width: 8px;
+    border-radius: 4px;
+}
+
+QAbstractScrollArea QScrollBar::handle:vertical {
+    background-color: rgba(48, 54, 61, 0.6);
+    border-radius: 4px;
+    min-height: 30px;
+}
+
+QAbstractScrollArea QScrollBar::handle:vertical:hover {
+    background-color: rgba(48, 54, 61, 0.8);
 }
