@@ -61,17 +61,17 @@ Loom features optimized syntax highlighting powered by KDE's KSyntaxHighlighting
 - **Real-time Updates** - Instant color changes without restart
 - **Professional Quality** - Used by KDE applications worldwide
 
-### Syntax Highlighting Configuration
+### Unified Theme System
 
-#### KSyntaxHighlighting Theme Configuration (`config/config.lua`)
+Loom features a **single unified theme system** that applies consistent styling across both the application UI and syntax highlighting. No separate configuration is needed - one theme setting controls everything.
 
-Configure syntax highlighting themes and colors:
+#### Theme Configuration (`config/config.lua`)
+
+Configure your theme with a single setting:
 
 ```lua
--- Theme settings with KSyntaxHighlighting integration
 theme = {
-    name = "gruvbox", -- Available: "gruvbox", "dracula", "catppuccin-mocha"
-    syntax_theme = "gruvbox Dark" -- KSyntaxHighlighting theme
+    name = "gruvbox Dark" -- Single unified theme for both app UI and syntax highlighting
     -- Available themes: "Atom One Dark", "Atom One Light", "Breeze Dark", "Breeze Light",
     --                   "Dracula", "Falcon", "GitHub Dark", "GitHub Light", "Monokai",
     --                   "Nord", "Oblivion", "Printing", "Radical", "Solarized Dark",
@@ -80,97 +80,52 @@ theme = {
 }
 ```
 
-#### Available KSyntaxHighlighting Themes
+#### Available Unified Themes
 
-Loom supports all built-in KSyntaxHighlighting themes:
+Loom supports 21 built-in themes that provide consistent styling for both the application interface and code syntax highlighting:
 
 **Dark Themes:**
-- `Breeze Dark` - KDE's default dark theme
+- `Atom One Dark` - GitHub's Atom editor dark theme
+- `Breeze Dark` - KDE's elegant dark theme
 - `Dracula` - Popular dark theme with purple accents
-- `Monokai` - Classic dark theme
-- `Nord` - Arctic-inspired dark theme
-- `Solarized Dark` - Low-contrast dark theme
-- `Vim Dark` - Vim-inspired dark theme
-- `Atom One Dark` - Atom editor's dark theme
-- `GitHub Dark` - GitHub's dark theme
-- `gruvbox Dark` - Gruvbox dark variant
-- `ayu Dark` - Ayu dark theme
-- `ayu Mirage` - Ayu mirage variant
+- `Falcon` - Unique dark theme with orange highlights
+- `GitHub Dark` - GitHub's modern dark interface
+- `Monokai` - Classic dark theme with bright colors
+- `Nord` - Arctic-inspired blue-tinted dark theme
+- `Oblivion` - High-contrast dark theme
+- `Radical` - Cyberpunk-inspired dark theme with neon accents
+- `Solarized Dark` - Low-contrast scientific dark theme
+- `Vim Dark` - Traditional terminal-inspired dark theme
+- `ayu Dark` - Modern dark theme with muted colors
+- `ayu Mirage` - Ayu's balanced dark variant
+- `gruvbox Dark` - Retro groove dark theme (default)
 
 **Light Themes:**
-- `Breeze Light` - KDE's default light theme
-- `Solarized Light` - Low-contrast light theme
-- `Atom One Light` - Atom editor's light theme
-- `GitHub Light` - GitHub's light theme
-- `gruvbox Light` - Gruvbox light variant
-- `ayu Light` - Ayu light theme
+- `Atom One Light` - Clean and minimal light theme
+- `Breeze Light` - KDE's bright and airy light theme
+- `GitHub Light` - GitHub's clean light interface
+- `Solarized Light` - Scientific light theme with warm tones
+- `ayu Light` - Bright and modern light theme
+- `gruvbox Light` - Warm retro light variant
 
-**Special Themes:**
-- `Printing` - High-contrast theme optimized for printing
-- `Oblivion` - High-contrast theme for accessibility
-- `Radical` - High-contrast theme
-- `Falcon` - Unique color scheme
+**Special Purpose:**
+- `Printing` - High-contrast theme optimized for printing documents
 
-### Color Customization Guide
+#### Theme Features
 
-#### Understanding Color Values
-- Colors use **hexadecimal format**: `#RRGGBB`
-- **Examples:**
-  - `#fb4934` - Bright red
-  - `#fabd2f` - Bright yellow
-  - `#b8bb26` - Bright green
-  - `#83a598` - Bright blue
-  - `#d3869b` - Bright purple
-  - `#fe8019` - Bright orange
-  - `#928374` - Gray
+Each theme provides:
+- **Consistent UI Styling** - Menus, dialogs, tabs, and scroll bars match the theme
+- **Syntax Highlighting** - Code colors are perfectly coordinated with the UI
+- **Modern Scroll Bars** - Sleek 8px transparent scroll bars with theme-specific accents
+- **Clean Interface** - No distracting minimaps or visual clutter
+- **Accessibility** - Proper contrast ratios and readable color combinations
 
-#### Customizing Colors
+#### Switching Themes
 
-1. **Edit Configuration File:**
-   ```bash
-   # Open the configuration file
-   nano config/config.lua
-   ```
-
-2. **Modify Color Values:**
-   ```lua
-   -- Change keyword color to blue
-   syntax = {
-       keyword = "#83a598",  -- Changed from red to blue
-       -- ... other colors
-   }
-
-   -- Change HTML tags to purple
-   basic_highlighter = {
-       tag = "#d3869b",  -- Changed from red to purple
-       -- ... other colors
-   }
-   ```
-
-3. **Apply Changes:**
-   - Save the configuration file
-   - Restart Loom or reload configuration
-   - Colors update immediately for new files
-   - Existing files may need reopening
-
-#### Theme Consistency
-
-For consistent theming across both highlighting systems:
-
-```lua
--- Example: Blue theme
-syntax = {
-    keyword = "#83a598",
-    string = "#b8bb26",
-    comment = "#928374"
-}
-
-basic_highlighter = {
-    tag = "#83a598",        -- Match keyword color
-    attribute = "#fabd2f",  -- Use complementary yellow
-    css_property = "#83a598" -- Match keyword color
-}
-```
+Change themes instantly without restart:
+1. **Via Configuration**: Edit `config/config.lua` and save
+2. **Via Plugin**: Use the Theme Switcher plugin (Ctrl+Shift+T)
+3. **Via Menu**: File → Theme Switcher (if plugin is loaded)
 
 ### Plugin System
 - **Extensible Architecture** - Lua-based plugin system for unlimited customization
