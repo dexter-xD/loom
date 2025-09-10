@@ -13,6 +13,7 @@ Built with C++ and Qt, featuring Lua scripting for configuration and plugins
 [![C++ Standard](https://img.shields.io/badge/C++-17-blue)]()
 [![Lua](https://img.shields.io/badge/Lua-5.1-lightblue.svg)]()
 [![KSyntaxHighlighting](https://img.shields.io/badge/KSyntaxHighlighting-300%2B%20Languages-orange)]()
+[![KTextEditor](https://img.shields.io/badge/KTextEditor-Professional%20Editing-blue)]()
 
 ![Loom Banner](banner.png)
 
@@ -20,24 +21,30 @@ Built with C++ and Qt, featuring Lua scripting for configuration and plugins
 
 ## Features
 
-- **Lightweight & Fast** - Minimal resource usage with responsive text editing
-- **Multiple Themes** - Choose from Gruvbox, Dracula, and Catppuccin Mocha themes
+- **Professional Text Editing** - Powered by KDE's KTextEditor framework used in Kate and KDevelop
+- **Advanced Syntax Highlighting** - KSyntaxHighlighting engine with 300+ language definitions
+- **21 Unified Themes** - Consistent styling across UI and syntax highlighting with modern scroll bars
 - **Theme Switching** - Toggle between themes with `Ctrl+Shift+T` or Tools menu
-- **Syntax Highlighting** - Support for multiple programming languages
-- **Multi-Tab Interface** - Manage multiple files with tabbed interface
+- **Multi-Tab Interface** - Clean tab interface with no distracting mnemonics or underlines
 - **File Tree Viewer** - Navigate project directories with a collapsible file tree panel
 - **Project Support** - Open entire project directories and navigate files easily
+- **Modern Interface** - Sleek 8px transparent scroll bars with no pixelated minimap
+- **Lightweight & Fast** - Minimal resource usage with responsive text editing
 - **Customizable Keybindings** - Configure shortcuts to match your workflow
 - **Line Numbers** - Optional line number display with relative numbering
-- **Find & Replace** - Built-in search and replace functionality
+- **Find & Replace** - Built-in search and replace functionality powered by KTextEditor
 
 ## Syntax Highlighting
 
 Loom features optimized syntax highlighting powered by KDE's KSyntaxHighlighting framework, providing smooth, fast, and comprehensive language support with beautiful, customizable colors.
 
-### KSyntaxHighlighting System
+### KTextEditor & KSyntaxHighlighting System
 
-**Professional-grade syntax highlighting with excellent performance and comprehensive language support.**
+**Professional text editing powered by KDE Frameworks with comprehensive syntax highlighting and modern editing features.**
+
+Loom integrates two powerful KDE Framework components:
+- **KTextEditor**: Advanced text editing engine used by Kate and KDevelop
+- **KSyntaxHighlighting**: Professional syntax highlighting with 300+ language definitions
 
 **Supported Languages & Formats (300+):**
 - **Programming Languages**: C/C++, Python, JavaScript/TypeScript, Java, Rust, Go, Lua, PHP, Ruby, Swift, Kotlin, Scala, Haskell, Erlang, Elixir, Clojure, Scheme, R, Julia, MATLAB, Perl, Shell/Bash, PowerShell, SQL, GraphQL, YAML, TOML, XML
@@ -53,13 +60,18 @@ Loom features optimized syntax highlighting powered by KDE's KSyntaxHighlighting
 - **Build Systems**: Makefile, CMake, Ninja, Gradle, Maven, Ant
 - **And 200+ more languages and formats...**
 
-**Features:**
+**KTextEditor Features:**
+- **Advanced Editing** - Professional text manipulation and navigation
+- **Modern Interface** - Clean, distraction-free editing environment
+- **Performance Optimized** - Handles large files efficiently
+- **Extensible Framework** - Battle-tested by KDE applications
+
+**KSyntaxHighlighting Features:**
 - **High Performance** - Optimized rendering with minimal resource usage
-- **Smooth Operation** - No UI freezing or lag during editing
-- **Comprehensive Support** - Extensive language and format coverage
-- **Theme Integration** - Seamless integration with Loom's theme system
+- **Comprehensive Support** - 300+ languages and file formats
+- **Theme Integration** - Seamless integration with Loom's unified theme system
 - **Real-time Updates** - Instant color changes without restart
-- **Professional Quality** - Used by KDE applications worldwide
+- **Professional Quality** - Used by Kate, KDevelop, and other KDE applications
 
 ### Unified Theme System
 
@@ -152,6 +164,7 @@ Before building Loom, ensure you have the following installed:
 - **CMake** 3.16 or higher
 - **Qt5** development libraries
 - **Lua** 5.3 or 5.4 development libraries
+- **KTextEditor** and **KSyntaxHighlighting** from KDE Frameworks
 - **C++17** compatible compiler (GCC, Clang, or MSVC)
 
 ### Installation
@@ -173,7 +186,8 @@ loom
 ```bash
 # Install dependencies
 sudo apt update
-sudo apt install cmake qtbase5-dev liblua5.4-dev build-essential
+sudo apt install cmake qtbase5-dev liblua5.4-dev build-essential \
+                 libkf5texteditor-dev libkf5syntaxhighlighting-dev
 
 # Clone the repository
 git clone https://github.com/dexter-xd/loom.git
@@ -190,7 +204,8 @@ chmod +x scripts/build_release.sh
 #### Linux (Fedora/RHEL)
 ```bash
 # Install dependencies
-sudo dnf install cmake qt5-qtbase-devel lua-devel gcc-c++
+sudo dnf install cmake qt5-qtbase-devel lua-devel gcc-c++ \
+                 kf5-ktexteditor-devel kf5-syntax-highlighting-devel
 
 # Clone and build
 git clone https://github.com/dexter-xd/loom.git
@@ -202,7 +217,7 @@ chmod +x scripts/build_release.sh
 #### macOS
 ```bash
 # Install dependencies with Homebrew
-brew install cmake qt@5 lua
+brew install cmake qt@5 lua kde-frameworks
 
 # Clone and build
 git clone https://github.com/dexter-xd/loom.git
@@ -692,48 +707,54 @@ keybindings = {
 ```
 loom/
 ├── src/                    # Main source code
+│   ├── main.cpp           # Application entry point
+│   ├── editor_window.cpp  # Main window and UI logic
+│   ├── code_editor.cpp    # KTextEditor integration
+│   ├── buffer.cpp         # File buffer management
+│   ├── lua_bridge.cpp     # Lua scripting interface
+│   ├── plugin_manager.cpp # Plugin system
+│   └── file_tree_widget.cpp # File tree sidebar
 ├── include/               # Header files
-├── config/               # Configuration files
+├── config/               # Lua configuration files
 ├── plugins/              # Lua plugins
-├── themes/               # Qt theme files
-├── test_files/           # Sample files for testing
-├── external/             # External dependencies (Tree-sitter)
-│   ├── tree-sitter/      # Tree-sitter core library
-│   ├── tree-sitter-c/    # C language grammar
-│   ├── tree-sitter-cpp/  # C++ language grammar
-│   ├── tree-sitter-python/  # Python language grammar
-│   └── ...               # Other language grammars
-├── scripts/              # Build and utility scripts
-└── debian/               # Debian packaging files
+├── themes/               # Qt stylesheet themes (21 themes)
+├── test_files/           # Sample files for testing KTextEditor
 ```
 
 ### External Dependencies
 
-Loom uses **KSyntaxHighlighting** from KDE Frameworks for professional-grade syntax highlighting. KSyntaxHighlighting is automatically included as a system dependency:
+Loom uses **KTextEditor** and **KSyntaxHighlighting** from KDE Frameworks for professional-grade text editing and syntax highlighting:
 
-- **KF5SyntaxHighlighting**: KDE Frameworks syntax highlighting library
+#### KTextEditor
+- **KF5TextEditor**: Advanced text editing component from KDE Frameworks
+- Provides professional text editing features like advanced search/replace, bookmarks, and text manipulation
+- Powers the main editor interface with modern editing capabilities
+- Used by Kate, KDevelop, and other KDE applications
+
+#### KSyntaxHighlighting  
+- **KF5SyntaxHighlighting**: Comprehensive syntax highlighting engine
 - Provides 300+ language definitions and syntax highlighting themes
-- No additional setup required - installed via system package manager
+- Powers the unified theme system with consistent styling
 - Lightweight and optimized for performance
 
-#### Installing KSyntaxHighlighting
+#### Installing KDE Framework Dependencies
 
 **Ubuntu/Debian:**
 ```bash
-sudo apt install libkf5syntaxhighlighting-dev
+sudo apt install libkf5texteditor-dev libkf5syntaxhighlighting-dev
 ```
 
 **Fedora/RHEL:**
 ```bash
-sudo dnf install kf5-syntax-highlighting-devel
+sudo dnf install kf5-ktexteditor-devel kf5-syntax-highlighting-devel
 ```
 
 **Arch Linux:**
 ```bash
-sudo pacman -S syntax-highlighting
+sudo pacman -S ktexteditor syntax-highlighting
 ```
 
-**Note:** KSyntaxHighlighting is a standard KDE Frameworks library and is typically available in most Linux distributions' package repositories.
+**Note:** Both libraries are standard KDE Frameworks components and are typically available in most Linux distributions' package repositories.
 
 ### Debug Build
 
