@@ -179,6 +179,7 @@ private:
     void loadTheme(const QString &themeName);
     void applyTheme();
     void updateEditorThemeColors(const QString &themeName);
+    void showAboutDialog();
 };
 
 #endif
