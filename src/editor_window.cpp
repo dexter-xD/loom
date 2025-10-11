@@ -14,3 +14,4 @@
 #include "editor_window/editor_window_actions.cpp"
 #include "editor_window/editor_window_theme.cpp"
 #include "editor_window/editor_window_events.cpp"
+#include "editor_window/editor_window_liveserver.cpp"

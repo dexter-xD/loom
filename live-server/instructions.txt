@@ -1,0 +1,21 @@
+# Default - serve ./public on port 8080
+./server
+
+# Serve a specific directory
+./server -d /var/www
+./server --dir ./dist
+
+# Change port
+./server -p 3000
+./server --port 5000
+
+# Combine options
+./server -d ./my-site -p 3000
+
+# Quick serve - just pass directory or file
+./server ./my-website
+./server index.html    # Serves current directory
+
+# Help
+./server -h
+./server --help

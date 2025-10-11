@@ -33,6 +33,7 @@ Built with C++ and Qt, featuring Lua scripting for configuration and plugins
 - **Customizable Keybindings** - Configure shortcuts to match your workflow
 - **Line Numbers** - Optional line number display with relative numbering
 - **Find & Replace** - Built-in search and replace functionality powered by KTextEditor
+- **Integrated Live Server** - Built-in HTTP server with hot reload for web development
 
 ## Syntax Highlighting
 
@@ -610,6 +611,78 @@ end
 _G["my_plugin.on_file_saved"] = my_plugin.on_file_saved
 
 print("My plugin loaded!")
+```
+
+## Live Server Integration
+
+Loom includes an integrated HTTP server with hot reload functionality for web development, similar to VS Code's Live Server extension.
+
+### Features
+
+- **Hot Reload**: Automatically reloads the browser when HTML, CSS, or JS files change
+- **WebSocket Integration**: Real-time communication for instant updates
+- **File Watching**: Efficient file system monitoring using inotify
+- **Menu Integration**: Start/stop server directly from the Tools menu
+- **Smart Directory Detection**: Automatically serves the current file's directory
+- **Browser Integration**: One-click browser opening
+- **Configurable Logging**: Choose between quiet, normal, or verbose output
+
+### Usage
+
+1. **Start Live Server**: Go to `Tools → Start Live Server` or use the keyboard shortcut
+2. **Edit Files**: Make changes to your HTML, CSS, or JavaScript files
+3. **Auto Reload**: The browser automatically refreshes when you save files
+4. **Stop Server**: Go to `Tools → Stop Live Server` when done
+
+### Configuration
+
+Configure the live server in `config/config.lua`:
+
+```lua
+live_server = {
+    enabled = true,
+    port = "8080",
+    auto_open_browser = false,
+    default_directory = "", -- empty means use current file's directory
+    executable_path = "", -- empty means use live-server from same directory as loom executable
+    log_level = "quiet" -- "quiet", "normal", or "verbose"
+}
+```
+
+**Log Level Options:**
+- `"quiet"` - Only show errors (default, recommended for production)
+- `"normal"` - Standard server output (startup messages, basic info)
+- `"verbose"` - Detailed debug output (file watching, WebSocket events)
+
+### Build Options
+
+The live-server can be built with or without integration:
+
+```bash
+# Build WITH live-server integration (default)
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_LIVE_SERVER=ON
+make -C build -j$(nproc)
+
+# Build WITHOUT live-server integration
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_LIVE_SERVER=OFF
+make -C build -j$(nproc)
+
+# Use the build script for convenience
+./scripts/build_options.sh with-live-server     # Build with live-server
+./scripts/build_options.sh without-live-server  # Build without live-server
+```
+
+### Standalone Usage
+
+The live-server can also be used independently:
+
+```bash
+# Build standalone live-server
+cd live-server
+make
+
+# Run standalone
+./build/live-server -d ./my-website -p 3000 -v
 ```
 
 ## Theming

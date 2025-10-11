@@ -27,6 +27,10 @@
 #include <QTabBar>
 #include <QPainter>
 #include <QStyleOptionTab>
+#include <QProcess>
+#include <QDir>
+#include <QUrl>
+#include <QDesktopServices>
 #include "buffer.h"
 #include "lua_bridge.h"
 #include "debug_log.h"
@@ -132,6 +136,16 @@ private slots:
 
     void updateLuaEditorState();
 
+    void toggleLiveServer();
+    void startLiveServer();
+    void stopLiveServer();
+    void onLiveServerFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void onLiveServerError(QProcess::ProcessError error);
+    void onLiveServerStandardOutput();
+    void onLiveServerStandardError();
+    QString cleanLiveServerOutput(const QString& rawOutput);
+    void openInBrowser();
+
 private:
 
     NoMnemonicTabWidget* m_tabWidget;
@@ -148,6 +162,11 @@ private:
 
     QSplitter *m_mainSplitter;
     FileTreeWidget *m_fileTreeWidget;
+
+    QProcess *m_liveServerProcess;
+    bool m_liveServerRunning;
+    QString m_liveServerPort;
+    QString m_liveServerDir;
 
     void setupUI();
     void setupMenus();

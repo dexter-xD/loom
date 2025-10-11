@@ -5,7 +5,21 @@ EditorWindow::EditorWindow(QWidget *parent)
     , m_tabWidget(nullptr)
     , m_statusBar(nullptr)
     , m_luaBridge(nullptr)
+    , m_liveServerProcess(nullptr)
+    , m_liveServerRunning(false)
+    , m_liveServerPort("8080")
+    , m_liveServerDir("")
 {
+
+    m_liveServerProcess = new QProcess(this);
+    connect(m_liveServerProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            this, &EditorWindow::onLiveServerFinished);
+    connect(m_liveServerProcess, &QProcess::errorOccurred,
+            this, &EditorWindow::onLiveServerError);
+    connect(m_liveServerProcess, &QProcess::readyReadStandardOutput,
+            this, &EditorWindow::onLiveServerStandardOutput);
+    connect(m_liveServerProcess, &QProcess::readyReadStandardError,
+            this, &EditorWindow::onLiveServerStandardError);
 
     m_luaBridge = new LuaBridge(this);
     if (!m_luaBridge->initialize()) {
@@ -49,6 +63,10 @@ EditorWindow::EditorWindow(QWidget *parent)
 
 EditorWindow::~EditorWindow()
 {
+
+    if (m_liveServerRunning) {
+        stopLiveServer();
+    }
 
     for (auto shortcut : m_shortcuts) {
         delete shortcut;

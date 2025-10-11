@@ -79,6 +79,25 @@ config = {
             enabled = true,
             auto_load = true
         },
+    },
+
+    -- live server configuration
+    live_server = {
+        enabled = true,
+        port = "8080",
+        auto_open_browser = false,
+        default_directory = "", -- empty means use current file's directory
+        executable_path = "", -- empty means use live-server from same directory as loom executable
+        log_level = "normal", -- logging level: "quiet", "normal", "verbose" (default: "quiet")
+        show_output_in_console = true -- show live-server output in console (default: true)
+        
+        -- Log Level Options:
+        -- "quiet" - Only show errors (minimal output, recommended for production)
+        -- "normal" - Standard server output (startup messages, basic info)
+        -- "verbose" - Detailed debug output (file watching, WebSocket events)
+        -- 
+        -- show_output_in_console - Whether to display live-server output in the console
+        -- where the text editor was started. Set to false to disable console output.
     }
 }
 

@@ -55,6 +55,9 @@ include_directories(include)
 set(RESOURCE_FILES themes/gruvbox.qss)
 qt5_add_resources(RESOURCES themes.qrc)
 
+# add live-server subdirectory
+add_subdirectory(live-server)
+
 # create executable target
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
 
@@ -88,6 +91,12 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
 # installation settings
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+
+# Install live-server binary
+install(TARGETS live-server RUNTIME DESTINATION bin)
+
+# Also install the live-server-bin copy that the main application uses
+install(PROGRAMS ${CMAKE_BINARY_DIR}/live-server-bin DESTINATION bin)
 
 # Install config and plugins directories with proper permissions
 install(DIRECTORY config/

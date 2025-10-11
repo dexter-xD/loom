@@ -14,13 +14,12 @@ void EditorWindow::showAboutDialog()
 
 void EditorWindow::setupMenus()
 {
-    // Get keybindings from Lua configuration
+
     QMap<QString, QString> keybindings;
     if (m_luaBridge) {
         keybindings = m_luaBridge->getKeybindings();
     }
 
-    // Helper function to find shortcut for action
     auto findShortcut = [&keybindings](const QString& action) -> QString {
         for (auto it = keybindings.begin(); it != keybindings.end(); ++it) {
             if (it.value() == action) {
@@ -266,7 +265,7 @@ void EditorWindow::setupMenus()
 
     menuBar()->addMenu("&Tools");
     refreshToolsMenu();
-    
+
     QMenu *helpMenu = menuBar()->addMenu("&Help");
     QAction *aboutAction = new QAction("&About Loom", this);
     aboutAction->setStatusTip("Show application information");
@@ -276,13 +275,12 @@ void EditorWindow::setupMenus()
 
 void EditorWindow::refreshToolsMenu()
 {
-    // Get keybindings from Lua configuration
+
     QMap<QString, QString> keybindings;
     if (m_luaBridge) {
         keybindings = m_luaBridge->getKeybindings();
     }
 
-    // Helper function to find shortcut for action
     auto findShortcut = [&keybindings](const QString& action) -> QString {
         for (auto it = keybindings.begin(); it != keybindings.end(); ++it) {
             if (it.value() == action) {
@@ -348,6 +346,20 @@ void EditorWindow::refreshToolsMenu()
     if (hasPluginMenuItems) {
         toolsMenu->addSeparator();
     }
+
+    QAction *toggleLiveServerAction = new QAction(m_liveServerRunning ? "&Stop Live Server" : "&Start Live Server", this);
+    toggleLiveServerAction->setStatusTip(m_liveServerRunning ? "Stop the live development server" : "Start the live development server");
+    connect(toggleLiveServerAction, &QAction::triggered, this, &EditorWindow::toggleLiveServer);
+    toolsMenu->addAction(toggleLiveServerAction);
+
+    if (m_liveServerRunning) {
+        QAction *openBrowserAction = new QAction("Open in &Browser", this);
+        openBrowserAction->setStatusTip("Open the live server in your default browser");
+        connect(openBrowserAction, &QAction::triggered, this, &EditorWindow::openInBrowser);
+        toolsMenu->addAction(openBrowserAction);
+    }
+
+    toolsMenu->addSeparator();
 
     QAction *reloadPluginsAction = new QAction("&Reload Plugins", this);
     reloadPluginsAction->setStatusTip("Reload all plugins from the plugins directory");
