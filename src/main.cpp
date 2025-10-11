@@ -63,6 +63,9 @@ int main(int argc, char *argv[])
     }
 
     window.show();
+    
+    // Setup KTextEditor shortcuts after the window is shown and widgets are fully initialized
+    window.setupKTextEditorShortcuts();
 
     return app.exec();
 }

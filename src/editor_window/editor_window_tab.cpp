@@ -52,6 +52,9 @@ int EditorWindow::createNewTab(const QString &title)
     escapedTitle.replace("&", "&&");
     int tabIndex = m_tabWidget->addTab(textEdit, escapedTitle);
 
+    // Set this tab as current
+    m_tabWidget->setCurrentIndex(tabIndex);
+
     DEBUG_LOG_EDITOR("Created new tab" << tabIndex << "with title:" << title);
 
     return tabIndex;
@@ -138,6 +141,8 @@ void EditorWindow::onTabChanged(int index)
     CodeEditor* textEdit = getCurrentTextEditor();
     if (textEdit) {
         textEdit->setFocus();
+        // Setup KTextEditor shortcuts for the current tab
+        setupKTextEditorShortcuts();
     }
 }
 

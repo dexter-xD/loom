@@ -82,6 +82,9 @@ void EditorWindow::openFile(const QString &filePath)
             args << filePath;
             m_luaBridge->emitEvent("file_opened", args);
         }
+
+        // Setup KTextEditor shortcuts for the newly opened file
+        setupKTextEditorShortcuts();
     }
 }
 

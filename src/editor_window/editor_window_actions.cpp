@@ -7,6 +7,7 @@ void EditorWindow::setupKeybindings()
         return;
     }
 
+    // Clear existing shortcuts
     for (auto shortcut : m_shortcuts) {
         delete shortcut;
     }
@@ -21,8 +22,12 @@ void EditorWindow::setupKeybindings()
 
         DEBUG_LOG_EDITOR("Found keybinding:" << keySequence << "->" << action);
 
+        // Create shortcut with higher priority to override KTextEditor defaults
         QShortcut *shortcut = new QShortcut(QKeySequence(keySequence), this);
-        shortcut->setContext(Qt::ApplicationShortcut); 
+        shortcut->setContext(Qt::ApplicationShortcut);
+        
+        // Set autoRepeat to false to avoid conflicts
+        shortcut->setAutoRepeat(false);
 
         connect(shortcut, &QShortcut::activated, [this, action, keySequence]() {
             DEBUG_LOG_EDITOR("Shortcut activated:" << keySequence << "->" << action);
@@ -39,7 +44,6 @@ void EditorWindow::setupKeybindings()
     } else {
         DEBUG_LOG_EDITOR("✗ toggle_file_tree shortcut NOT found in keybindings");
     }
-
 }
 
 bool EditorWindow::isPluginActionEnabled(const QString &pluginName) const
@@ -56,8 +60,7 @@ bool EditorWindow::isPluginActionEnabled(const QString &pluginName) const
 
 void EditorWindow::executeAction(const QString &action)
 {
-
-    m_statusBar->showMessage(QString("Action: %1").arg(action), 1000);
+    DEBUG_LOG_EDITOR("Executing action:" << action);
 
     if (action == "save_file") {
         saveFile();
@@ -71,40 +74,112 @@ void EditorWindow::executeAction(const QString &action)
         close();
     } else if (action == "undo") {
         CodeEditor* textEdit = getCurrentTextEditor();
-        if (textEdit) textEdit->undo();
+        if (textEdit && textEdit->view()) {
+            QAction* undoAction = textEdit->view()->action("edit_undo");
+            if (undoAction) {
+                undoAction->trigger();
+                DEBUG_LOG_EDITOR("Triggered KTextEditor undo action");
+            } else {
+                textEdit->undo();
+                DEBUG_LOG_EDITOR("Triggered fallback undo action");
+            }
+        }
     } else if (action == "redo") {
         CodeEditor* textEdit = getCurrentTextEditor();
-        if (textEdit) textEdit->redo();
+        if (textEdit && textEdit->view()) {
+            QAction* redoAction = textEdit->view()->action("edit_redo");
+            if (redoAction) {
+                redoAction->trigger();
+                DEBUG_LOG_EDITOR("Triggered KTextEditor redo action");
+            } else {
+                textEdit->redo();
+                DEBUG_LOG_EDITOR("Triggered fallback redo action");
+            }
+        }
     } else if (action == "copy") {
         CodeEditor* textEdit = getCurrentTextEditor();
-        if (textEdit) textEdit->copy();
+        if (textEdit && textEdit->view()) {
+            QAction* copyAction = textEdit->view()->action("edit_copy");
+            if (copyAction) {
+                copyAction->trigger();
+                DEBUG_LOG_EDITOR("Triggered KTextEditor copy action");
+            } else {
+                textEdit->copy();
+                DEBUG_LOG_EDITOR("Triggered fallback copy action");
+            }
+        }
     } else if (action == "paste") {
         CodeEditor* textEdit = getCurrentTextEditor();
-        if (textEdit) textEdit->paste();
+        if (textEdit && textEdit->view()) {
+            QAction* pasteAction = textEdit->view()->action("edit_paste");
+            if (pasteAction) {
+                pasteAction->trigger();
+                DEBUG_LOG_EDITOR("Triggered KTextEditor paste action");
+            } else {
+                textEdit->paste();
+                DEBUG_LOG_EDITOR("Triggered fallback paste action");
+            }
+        }
     } else if (action == "cut") {
         CodeEditor* textEdit = getCurrentTextEditor();
-        if (textEdit) textEdit->cut();
+        if (textEdit && textEdit->view()) {
+            QAction* cutAction = textEdit->view()->action("edit_cut");
+            if (cutAction) {
+                cutAction->trigger();
+                DEBUG_LOG_EDITOR("Triggered KTextEditor cut action");
+            } else {
+                textEdit->cut();
+                DEBUG_LOG_EDITOR("Triggered fallback cut action");
+            }
+        }
     } else if (action == "select_all") {
         CodeEditor* textEdit = getCurrentTextEditor();
-        if (textEdit) textEdit->selectAll();
+        if (textEdit && textEdit->view()) {
+            QAction* selectAllAction = textEdit->view()->action("edit_select_all");
+            if (selectAllAction) {
+                selectAllAction->trigger();
+                DEBUG_LOG_EDITOR("Triggered KTextEditor select all action");
+            } else {
+                textEdit->selectAll();
+                DEBUG_LOG_EDITOR("Triggered fallback select all action");
+            }
+        }
     } else if (action == "new_tab") {
         newFile();
     } else if (action == "find") {
-        showFindDialog();
+        CodeEditor* textEdit = getCurrentTextEditor();
+        if (textEdit && textEdit->view()) {
+            QAction* findAction = textEdit->view()->action("edit_find");
+            if (findAction) {
+                findAction->trigger();
+                DEBUG_LOG_EDITOR("Triggered KTextEditor find action");
+            } else {
+                showFindDialog();
+                DEBUG_LOG_EDITOR("Triggered fallback find dialog");
+            }
+        } else {
+            showFindDialog();
+        }
     } else if (action == "replace") {
-        showReplaceDialog();
+        CodeEditor* textEdit = getCurrentTextEditor();
+        if (textEdit && textEdit->view()) {
+            QAction* replaceAction = textEdit->view()->action("edit_replace");
+            if (replaceAction) {
+                replaceAction->trigger();
+                DEBUG_LOG_EDITOR("Triggered KTextEditor replace action");
+            } else {
+                showReplaceDialog();
+                DEBUG_LOG_EDITOR("Triggered fallback replace dialog");
+            }
+        } else {
+            showReplaceDialog();
+        }
     } else if (action == "toggle_fullscreen") {
         if (isFullScreen()) {
             showNormal();
         } else {
             showFullScreen();
         }
-    } else if (action == "set_language") {
-
-        m_statusBar->showMessage("Language dialog feature is currently disabled", 2000);
-    } else if (action == "redetect_language") {
-
-        m_statusBar->showMessage("Language redetection feature is currently disabled", 2000);
     } else if (action == "toggle_theme") {
         if (isPluginActionEnabled("theme_switcher")) {
             if (m_luaBridge) {
@@ -203,6 +278,17 @@ void EditorWindow::findText(const QString &searchText, bool caseSensitive)
         return;
     }
 
+    // Try to use KTextEditor's find functionality if available
+    if (textEdit->view()) {
+        KTextEditor::View* view = textEdit->view();
+        QAction* findAction = view->action("edit_find");
+        if (findAction) {
+            findAction->trigger();
+            return;
+        }
+    }
+
+    // Fallback to basic find functionality
     QTextDocument::FindFlags flags = QTextDocument::FindFlags();
     if (caseSensitive) {
         flags |= QTextDocument::FindCaseSensitively;
@@ -215,7 +301,7 @@ void EditorWindow::findText(const QString &searchText, bool caseSensitive)
         textEdit->setTextCursor(found);
         m_statusBar->showMessage(QString("Found: %1").arg(searchText), 2000);
     } else {
-
+        // Wrap to beginning
         cursor.movePosition(QTextCursor::Start);
         found = textEdit->document()->find(searchText, cursor, flags);
 
@@ -263,6 +349,50 @@ void EditorWindow::replaceText(const QString &searchText, const QString &replace
         } else {
 
             findText(searchText);
+        }
+    }
+}
+
+void EditorWindow::setupKTextEditorShortcuts()
+{
+    // Get the current text editor to setup KTextEditor-specific shortcuts
+    CodeEditor* textEdit = getCurrentTextEditor();
+    if (!textEdit || !textEdit->view() || !m_luaBridge) {
+        DEBUG_LOG_EDITOR("Cannot setup KTextEditor shortcuts - missing components");
+        return;
+    }
+
+    KTextEditor::View* view = textEdit->view();
+    
+    DEBUG_LOG_EDITOR("Disabling conflicting KTextEditor shortcuts");
+    
+    // List of KTextEditor actions that conflict with our shortcuts
+    QStringList conflictingActions = {
+        "file_save",
+        "file_save_as", 
+        "file_open",
+        "file_new",
+        "edit_undo",
+        "edit_redo",
+        "edit_copy",
+        "edit_paste",
+        "edit_cut",
+        "edit_select_all",
+        "edit_find",
+        "edit_replace"
+    };
+    
+    // Disable conflicting shortcuts in KTextEditor
+    for (const QString& actionName : conflictingActions) {
+        QAction* action = view->action(actionName.toUtf8().constData());
+        if (action) {
+            // Store original shortcut if we need to restore it later
+            QKeySequence originalShortcut = action->shortcut();
+            
+            // Clear the shortcut to prevent conflicts
+            action->setShortcut(QKeySequence());
+            
+            DEBUG_LOG_EDITOR("✓ Disabled KTextEditor shortcut for:" << actionName << "was:" << originalShortcut.toString());
         }
     }
 }

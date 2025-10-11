@@ -294,7 +294,7 @@ int LuaBridge::lua_saveFile(lua_State *L)
     }
 
     const char *filePath = nullptr;
-    if (lua_gettop(L) >= 1) {
+    if (lua_gettop(L) >= 1 && !lua_isnil(L, 1)) {
         filePath = luaL_checkstring(L, 1);
     }
 

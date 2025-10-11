@@ -94,6 +94,7 @@ public:
     void ensureAtLeastOneTab();
     void applyConfiguration();
     void setupKeybindings();
+    void setupKTextEditorShortcuts();
 
 protected:
 

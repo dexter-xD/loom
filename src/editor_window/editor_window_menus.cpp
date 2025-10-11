@@ -14,15 +14,47 @@ void EditorWindow::showAboutDialog()
 
 void EditorWindow::setupMenus()
 {
+    // Get keybindings from Lua configuration
+    QMap<QString, QString> keybindings;
+    if (m_luaBridge) {
+        keybindings = m_luaBridge->getKeybindings();
+    }
+
+    // Helper function to find shortcut for action
+    auto findShortcut = [&keybindings](const QString& action) -> QString {
+        for (auto it = keybindings.begin(); it != keybindings.end(); ++it) {
+            if (it.value() == action) {
+                return it.key();
+            }
+        }
+        return QString();
+    };
 
     QMenu *fileMenu = menuBar()->addMenu("&File");
 
     QAction *newAction = new QAction("&New", this);
+    QString newShortcut = findShortcut("new_file");
+    if (!newShortcut.isEmpty()) {
+        newAction->setText(QString("&New\t%1").arg(newShortcut));
+    }
     newAction->setStatusTip("Create a new file");
     connect(newAction, &QAction::triggered, this, &EditorWindow::onNewFile);
     fileMenu->addAction(newAction);
 
+    QAction *newTabAction = new QAction("New &Tab", this);
+    QString newTabShortcut = findShortcut("new_tab");
+    if (!newTabShortcut.isEmpty()) {
+        newTabAction->setText(QString("New &Tab\t%1").arg(newTabShortcut));
+    }
+    newTabAction->setStatusTip("Create a new tab");
+    connect(newTabAction, &QAction::triggered, this, &EditorWindow::onNewFile);
+    fileMenu->addAction(newTabAction);
+
     QAction *openAction = new QAction("&Open", this);
+    QString openShortcut = findShortcut("open_file");
+    if (!openShortcut.isEmpty()) {
+        openAction->setText(QString("&Open\t%1").arg(openShortcut));
+    }
     openAction->setStatusTip("Open an existing file");
     connect(openAction, &QAction::triggered, this, &EditorWindow::onOpenFile);
     fileMenu->addAction(openAction);
@@ -30,6 +62,10 @@ void EditorWindow::setupMenus()
     fileMenu->addSeparator();
 
     QAction *saveAction = new QAction("&Save", this);
+    QString saveShortcut = findShortcut("save_file");
+    if (!saveShortcut.isEmpty()) {
+        saveAction->setText(QString("&Save\t%1").arg(saveShortcut));
+    }
     saveAction->setStatusTip("Save the current file");
     connect(saveAction, &QAction::triggered, this, &EditorWindow::onSaveFile);
     fileMenu->addAction(saveAction);
@@ -41,21 +77,33 @@ void EditorWindow::setupMenus()
 
     fileMenu->addSeparator();
 
-    QAction *exitAction = new QAction("E&xit", this);
-    exitAction->setStatusTip("Exit the application");
-    connect(exitAction, &QAction::triggered, this, &EditorWindow::onExit);
-    fileMenu->addAction(exitAction);
-
     QAction *closeAction = new QAction("&Close", this);
+    QString closeShortcut = findShortcut("close_file");
+    if (!closeShortcut.isEmpty()) {
+        closeAction->setText(QString("&Close\t%1").arg(closeShortcut));
+    }
     closeAction->setStatusTip("Close the current file");
     connect(closeAction, &QAction::triggered, this, &EditorWindow::onCloseFile);
     fileMenu->addAction(closeAction);
 
     fileMenu->addSeparator();
 
+    QAction *exitAction = new QAction("E&xit", this);
+    QString exitShortcut = findShortcut("quit_application");
+    if (!exitShortcut.isEmpty()) {
+        exitAction->setText(QString("E&xit\t%1").arg(exitShortcut));
+    }
+    exitAction->setStatusTip("Exit the application");
+    connect(exitAction, &QAction::triggered, this, &EditorWindow::onExit);
+    fileMenu->addAction(exitAction);
+
     QMenu *editMenu = menuBar()->addMenu("&Edit");
 
     QAction *undoAction = new QAction("&Undo", this);
+    QString undoShortcut = findShortcut("undo");
+    if (!undoShortcut.isEmpty()) {
+        undoAction->setText(QString("&Undo\t%1").arg(undoShortcut));
+    }
     undoAction->setStatusTip("Undo the last action");
     connect(undoAction, &QAction::triggered, [this]() {
         CodeEditor* textEdit = getCurrentTextEditor();
@@ -64,6 +112,10 @@ void EditorWindow::setupMenus()
     editMenu->addAction(undoAction);
 
     QAction *redoAction = new QAction("&Redo", this);
+    QString redoShortcut = findShortcut("redo");
+    if (!redoShortcut.isEmpty()) {
+        redoAction->setText(QString("&Redo\t%1").arg(redoShortcut));
+    }
     redoAction->setStatusTip("Redo the last undone action");
     connect(redoAction, &QAction::triggered, [this]() {
         CodeEditor* textEdit = getCurrentTextEditor();
@@ -74,6 +126,10 @@ void EditorWindow::setupMenus()
     editMenu->addSeparator();
 
     QAction *cutAction = new QAction("Cu&t", this);
+    QString cutShortcut = findShortcut("cut");
+    if (!cutShortcut.isEmpty()) {
+        cutAction->setText(QString("Cu&t\t%1").arg(cutShortcut));
+    }
     cutAction->setStatusTip("Cut the selected text");
     connect(cutAction, &QAction::triggered, [this]() {
         CodeEditor* textEdit = getCurrentTextEditor();
@@ -82,6 +138,10 @@ void EditorWindow::setupMenus()
     editMenu->addAction(cutAction);
 
     QAction *copyAction = new QAction("&Copy", this);
+    QString copyShortcut = findShortcut("copy");
+    if (!copyShortcut.isEmpty()) {
+        copyAction->setText(QString("&Copy\t%1").arg(copyShortcut));
+    }
     copyAction->setStatusTip("Copy the selected text");
     connect(copyAction, &QAction::triggered, [this]() {
         CodeEditor* textEdit = getCurrentTextEditor();
@@ -90,6 +150,10 @@ void EditorWindow::setupMenus()
     editMenu->addAction(copyAction);
 
     QAction *pasteAction = new QAction("&Paste", this);
+    QString pasteShortcut = findShortcut("paste");
+    if (!pasteShortcut.isEmpty()) {
+        pasteAction->setText(QString("&Paste\t%1").arg(pasteShortcut));
+    }
     pasteAction->setStatusTip("Paste text from clipboard");
     connect(pasteAction, &QAction::triggered, [this]() {
         CodeEditor* textEdit = getCurrentTextEditor();
@@ -100,6 +164,10 @@ void EditorWindow::setupMenus()
     editMenu->addSeparator();
 
     QAction *selectAllAction = new QAction("Select &All", this);
+    QString selectAllShortcut = findShortcut("select_all");
+    if (!selectAllShortcut.isEmpty()) {
+        selectAllAction->setText(QString("Select &All\t%1").arg(selectAllShortcut));
+    }
     selectAllAction->setStatusTip("Select all text");
     connect(selectAllAction, &QAction::triggered, [this]() {
         CodeEditor* textEdit = getCurrentTextEditor();
@@ -110,11 +178,19 @@ void EditorWindow::setupMenus()
     editMenu->addSeparator();
 
     QAction *findAction = new QAction("&Find", this);
+    QString findShortcutKey = findShortcut("find");
+    if (!findShortcutKey.isEmpty()) {
+        findAction->setText(QString("&Find\t%1").arg(findShortcutKey));
+    }
     findAction->setStatusTip("Find text in the document");
     connect(findAction, &QAction::triggered, this, &EditorWindow::showFindDialog);
     editMenu->addAction(findAction);
 
     QAction *replaceAction = new QAction("&Replace", this);
+    QString replaceShortcutKey = findShortcut("replace");
+    if (!replaceShortcutKey.isEmpty()) {
+        replaceAction->setText(QString("&Replace\t%1").arg(replaceShortcutKey));
+    }
     replaceAction->setStatusTip("Find and replace text in the document");
     connect(replaceAction, &QAction::triggered, this, &EditorWindow::showReplaceDialog);
     editMenu->addAction(replaceAction);
@@ -122,6 +198,10 @@ void EditorWindow::setupMenus()
     QMenu *viewMenu = menuBar()->addMenu("&View");
 
     QAction *fullscreenAction = new QAction("Toggle &Fullscreen", this);
+    QString fullscreenShortcut = findShortcut("toggle_fullscreen");
+    if (!fullscreenShortcut.isEmpty()) {
+        fullscreenAction->setText(QString("Toggle &Fullscreen\t%1").arg(fullscreenShortcut));
+    }
     fullscreenAction->setStatusTip("Toggle fullscreen mode");
     connect(fullscreenAction, &QAction::triggered, [this]() {
         if (isFullScreen()) {
@@ -148,7 +228,11 @@ void EditorWindow::setupMenus()
     viewMenu->addSeparator();
 
     QAction *toggleFileTreeAction = new QAction("Toggle &File Tree", this);
-    toggleFileTreeAction->setStatusTip("Toggle file tree visibility (F12)");
+    QString fileTreeShortcut = findShortcut("toggle_file_tree");
+    if (!fileTreeShortcut.isEmpty()) {
+        toggleFileTreeAction->setText(QString("Toggle &File Tree\t%1").arg(fileTreeShortcut));
+    }
+    toggleFileTreeAction->setStatusTip("Toggle file tree visibility");
     connect(toggleFileTreeAction, &QAction::triggered, [this]() {
         if (m_fileTreeWidget) {
             bool wasVisible = m_fileTreeWidget->isVisible();
@@ -192,6 +276,21 @@ void EditorWindow::setupMenus()
 
 void EditorWindow::refreshToolsMenu()
 {
+    // Get keybindings from Lua configuration
+    QMap<QString, QString> keybindings;
+    if (m_luaBridge) {
+        keybindings = m_luaBridge->getKeybindings();
+    }
+
+    // Helper function to find shortcut for action
+    auto findShortcut = [&keybindings](const QString& action) -> QString {
+        for (auto it = keybindings.begin(); it != keybindings.end(); ++it) {
+            if (it.value() == action) {
+                return it.key();
+            }
+        }
+        return QString();
+    };
 
     QMenu *toolsMenu = nullptr;
     for (QAction *action : menuBar()->actions()) {
@@ -211,6 +310,10 @@ void EditorWindow::refreshToolsMenu()
 
     if (isPluginActionEnabled("autoformat")) {
         QAction *formatAction = new QAction("&Format Document", this);
+        QString formatShortcut = findShortcut("format_document");
+        if (!formatShortcut.isEmpty()) {
+            formatAction->setText(QString("&Format Document\t%1").arg(formatShortcut));
+        }
         formatAction->setStatusTip("Format the current document using auto-formatter");
         connect(formatAction, &QAction::triggered, [this]() {
             if (m_luaBridge) {
@@ -228,6 +331,10 @@ void EditorWindow::refreshToolsMenu()
 
     if (isPluginActionEnabled("theme_switcher")) {
         QAction *toggleThemeAction = new QAction("&Toggle Theme", this);
+        QString themeShortcut = findShortcut("toggle_theme");
+        if (!themeShortcut.isEmpty()) {
+            toggleThemeAction->setText(QString("&Toggle Theme\t%1").arg(themeShortcut));
+        }
         toggleThemeAction->setStatusTip("Switch to the next available theme");
         connect(toggleThemeAction, &QAction::triggered, [this]() {
             if (m_luaBridge) {
