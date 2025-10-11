@@ -1,170 +1,77 @@
-cmake_minimum_required(VERSION 3.16)
+enable_language(C)
 
-# project configuration
-project(loom VERSION 1.3.0 LANGUAGES CXX C)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
-# set c++ standard
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# Compiler flags for live-server
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
 
-# linux compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0 -DDEBUG")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
+# Include directories
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-# ensure NDEBUG is set for release builds to disable debug logs
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_definitions(-DNDEBUG)
+# Source files
+set(LIVE_SERVER_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/server.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/mongoose.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/log.c
+)
+
+# Create executable with full path specification
+add_executable(live-server ${LIVE_SERVER_SOURCES})
+
+# Explicitly set the language for the target and disable Qt auto-generation
+set_target_properties(live-server PROPERTIES
+    LINKER_LANGUAGE C
+    AUTOMOC OFF
+    AUTORCC OFF
+    AUTOUIC OFF
+)
+
+# Link libraries (pthread for threading support)
+target_link_libraries(live-server pthread)
+
+# Copy the executable to the main build directory after building
+add_custom_command(TARGET live-server POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:live-server> ${CMAKE_BINARY_DIR}/live-server-bin
+    COMMENT "Copying live-server to main build directory"
+)
+
+# Install target
+install(TARGETS live-server DESTINATION bin)
+
+# Option to download mongoose if not present
+option(DOWNLOAD_MONGOOSE "Download mongoose.c and mongoose.h if not present" ON)
+
+if(DOWNLOAD_MONGOOSE)
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/mongoose.c")
+        message(STATUS "Downloading mongoose.c to src/...")
+        file(DOWNLOAD
+            "https://raw.githubusercontent.com/cesanta/mongoose/master/mongoose.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/mongoose.c"
+            SHOW_PROGRESS
+        )
+    endif()
+    
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/mongoose.h")
+        message(STATUS "Downloading mongoose.h to include/...")
+        file(DOWNLOAD
+            "https://raw.githubusercontent.com/cesanta/mongoose/master/mongoose.h"
+            "${CMAKE_CURRENT_SOURCE_DIR}/include/mongoose.h"
+            SHOW_PROGRESS
+        )
+    endif()
 endif()
 
-# find required packages
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
-find_package(Lua REQUIRED)
-find_package(KF5SyntaxHighlighting REQUIRED)
-find_package(KF5TextEditor REQUIRED)
+# Create public directory if it doesn't exist
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/public)
 
-# enable qt moc for Qt5
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
+# Create include and src directories if they don't exist
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-# source files
-set(SOURCES
-    src/main.cpp
-    src/editor_window.cpp
-    src/buffer.cpp
-    src/lua_bridge.cpp
-    src/plugin_manager.cpp
-    src/code_editor.cpp
-    src/file_tree_widget.cpp
-)
-
-# header files (needed for MOC processing)
-set(HEADERS
-    include/editor_window.h
-    include/buffer.h
-    include/lua_bridge.h
-    include/plugin_manager.h
-    include/code_editor.h
-    include/file_tree_widget.h
-)
-
-include_directories(include)
-
-# create resource file for Qt5
-set(RESOURCE_FILES themes/gruvbox.qss)
-qt5_add_resources(RESOURCES themes.qrc)
-
-# add live-server subdirectory
-add_subdirectory(live-server)
-
-# create executable target
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
-
-# link qt libraries and lua
-target_link_libraries(${PROJECT_NAME}
-    Qt5::Core
-    Qt5::Widgets
-    ${LUA_LIBRARIES}
-    KF5::SyntaxHighlighting
-    KF5::TextEditor
-)
-
-# include directories
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${LUA_INCLUDE_DIR}
-)
-
-# copy config and plugins folders to build directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/config ${CMAKE_BINARY_DIR}/config
-    COMMENT "Copying config directory to build folder"
-)
-
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/plugins ${CMAKE_BINARY_DIR}/plugins
-    COMMENT "Copying plugins directory to build folder"
-)
-
-# installation settings
-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
-
-# Install live-server binary
-install(TARGETS live-server RUNTIME DESTINATION bin)
-
-# Also install the live-server-bin copy that the main application uses
-install(PROGRAMS ${CMAKE_BINARY_DIR}/live-server-bin DESTINATION bin)
-
-# Install config and plugins directories with proper permissions
-install(DIRECTORY config/
-    DESTINATION share/${PROJECT_NAME}/config
-    FILES_MATCHING PATTERN "*.lua"
-    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
-
-install(DIRECTORY plugins/
-    DESTINATION share/${PROJECT_NAME}/plugins
-    FILES_MATCHING PATTERN "*.lua"
-    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
-
-# Install themes directory
-install(DIRECTORY themes/
-    DESTINATION share/${PROJECT_NAME}/themes
-    FILES_MATCHING PATTERN "*.qss"
-    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
-
-# Install assets and documentation
-install(FILES assets/icon.png DESTINATION share/${PROJECT_NAME}/assets)
-install(FILES README.md DESTINATION share/doc/${PROJECT_NAME})
-
-# Create desktop entry
-configure_file(
-    ${CMAKE_SOURCE_DIR}/loom.desktop.in
-    ${CMAKE_BINARY_DIR}/loom.desktop
-    @ONLY
-)
-install(FILES ${CMAKE_BINARY_DIR}/loom.desktop DESTINATION share/applications)
-install(FILES assets/icon.png DESTINATION share/pixmaps RENAME loom.png)
-
-# Install man page if it exists
-if(EXISTS ${CMAKE_SOURCE_DIR}/loom.1)
-    install(FILES loom.1 DESTINATION share/man/man1)
-endif()
-
-# CPack configuration for DEB packaging
-set(CPACK_GENERATOR "DEB")
-set(CPACK_PACKAGE_NAME "loom")
-set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A fast, minimal, and customizable text editor")
-set(CPACK_PACKAGE_DESCRIPTION "Loom is a fast, minimal, and customizable text editor built with C++ and Qt, featuring Lua scripting for configuration and plugins. It includes syntax highlighting, multi-tab interface, customizable keybindings, and an extensible plugin system.")
-set(CPACK_PACKAGE_MAINTAINER "dexter-xd <dexter-xd@users.noreply.github.com>")
-set(CPACK_PACKAGE_CONTACT "dexter-xd <dexter-xd@users.noreply.github.com>")
-set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/dexter-xd/loom")
-set(CPACK_PACKAGE_SECTION "editors")
-set(CPACK_PACKAGE_PRIORITY "optional")
-
-# DEB specific settings
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5core5a (>= 5.12), libqt5widgets5 (>= 5.12), libqt5gui5 (>= 5.12), liblua5.4-0 | liblua5.3-0")
-set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "clang-format, prettier, python3-black, nodejs, npm")
-set(CPACK_DEBIAN_PACKAGE_SUGGESTS "stylua, rustfmt")
-set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
-set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
-set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/postrm")
-
-# Package file name format: loom_1.0.0_amd64.deb
-set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
-
-# Include CPack
-include(CPack)
-
-# build type configuration
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
-
+# Print build information
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-message(STATUS "C++ compiler: ${CMAKE_CXX_COMPILER}")
-message(STATUS "Qt version: ${Qt5_VERSION}")
-message(STATUS "Package version: ${PROJECT_VERSION}")
+message(STATUS "C Compiler: ${CMAKE_C_COMPILER}")
+message(STATUS "C Flags: ${CMAKE_C_FLAGS}")
+message(STATUS "Source directory: ${CMAKE_CURRENT_SOURCE_DIR}")
+message(STATUS "Binary directory: ${CMAKE_CURRENT_BINARY_DIR}")
