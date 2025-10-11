@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     }
 
     app.setApplicationName("Loom");
-    app.setApplicationVersion("1.0.0");
+    app.setApplicationVersion("1.2.6");
     app.setOrganizationName("Loom");
 
     app.setWindowIcon(QIcon(":/assets/icon.png"));

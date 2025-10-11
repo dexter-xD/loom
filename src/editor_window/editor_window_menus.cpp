@@ -4,7 +4,7 @@ void EditorWindow::showAboutDialog()
 {
     QString aboutText = 
         "<h2>Loom Text Editor</h2>"
-        "<p>Version 1.2.5</p>"
+        "<p>Version 1.2.6</p>"
         "<p>A fast, minimal, and customizable text editor built with C++ and Qt</p>"
         "<p>GitHub: <a href='https://github.com/dexter-xD/loom'>https://github.com/dexter-xD/loom</a></p>"
         "<p>License: MIT</p>";

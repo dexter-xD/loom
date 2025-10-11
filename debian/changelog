@@ -1,3 +1,20 @@
+loom (1.2.6-1) unstable; urgency=medium
+
+  * Beta release with keyboard shortcut fixes and menu improvements
+  * FIXED: KTextEditor keyboard shortcut conflicts causing "Ambiguous shortcut detected" dialogs
+  * FIXED: Ctrl+S, Ctrl+C, Ctrl+V, Ctrl+Z and other shortcuts not working with KTextEditor
+  * NEW: Keyboard shortcuts displayed in all menu items (File, Edit, View, Tools)
+  * NEW: Dynamic shortcut display reading from Lua configuration
+  * ENHANCED: Improved KTextEditor integration with proper shortcut handling
+  * ENHANCED: Menu system with shortcuts shown next to each option
+  * ENHANCED: Application shortcuts take priority over KTextEditor defaults
+  * REMOVED: Manual language detection shortcuts (Ctrl+L, Ctrl+Shift+L) - KTextEditor handles this automatically
+  * IMPROVED: Seamless keyboard shortcut experience across the application
+  * IMPROVED: Professional menu appearance with shortcut indicators
+  * IMPROVED: Better integration between Lua configuration and Qt menus
+
+ -- dexter-xd <dexter-xd@users.noreply.github.com>  Sun, 10 Nov 2025 22:15:00 +0530
+
 loom (1.2.5-1) unstable; urgency=medium
 
   * Beta release with major performance improvements and syntax highlighting overhaul

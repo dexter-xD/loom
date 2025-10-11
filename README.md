@@ -172,10 +172,10 @@ Before building Loom, ensure you have the following installed:
 #### Linux (Ubuntu/Debian) - DEB Package (Recommended)
 ```bash
 # Download the latest DEB package from GitHub releases
-wget https://github.com/dexter-xd/loom/releases/download/beta_1.2.5/loom_1.2.5_amd64.deb
+wget https://github.com/dexter-xd/loom/releases/download/beta_1.2.6/loom_1.2.6_amd64.deb
 
 # Install the package
-sudo dpkg -i loom_1.2.5_amd64.deb
+sudo dpkg -i loom_1.2.6_amd64.deb
 sudo apt-get install -f  # Fix any dependency issues
 
 # Run Loom
@@ -371,6 +371,14 @@ config = {
         ["Ctrl+T"] = "new_tab",
         ["Ctrl+W"] = "close_file",
         ["Ctrl+Q"] = "quit_application",
+        ["Ctrl+Z"] = "undo",
+        ["Ctrl+Y"] = "redo",
+        ["Ctrl+C"] = "copy",
+        ["Ctrl+V"] = "paste",
+        ["Ctrl+X"] = "cut",
+        ["Ctrl+A"] = "select_all",
+        ["Ctrl+F"] = "find",
+        ["Ctrl+H"] = "replace",
         ["F11"] = "toggle_fullscreen",
         ["F12"] = "toggle_file_tree",         -- File tree panel toggle
         ["Ctrl+Shift+T"] = "toggle_theme",    -- Theme switching
@@ -681,8 +689,6 @@ Themes are defined in `themes/*.qss` files using Qt stylesheets. You can customi
 | `Ctrl+H` | Replace |
 | `F11` | Toggle fullscreen |
 | `F12` | Toggle file tree |
-| `Ctrl+L` | Set language |
-| `Ctrl+Shift+L` | Redetect language |
 | `Ctrl+Shift+T` | Toggle theme |
 | `Ctrl+Shift+F` | Format document |
 
