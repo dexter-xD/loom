@@ -173,10 +173,10 @@ Before building Loom, ensure you have the following installed:
 #### Linux (Ubuntu/Debian) - DEB Package (Recommended)
 ```bash
 # Download the latest DEB package from GitHub releases
-wget https://github.com/dexter-xd/loom/releases/download/beta_1.2.6/loom_1.2.6_amd64.deb
+wget https://github.com/dexter-xd/loom/releases/download/beta_1.3.0/loom_1.3.0_amd64.deb
 
 # Install the package
-sudo dpkg -i loom_1.2.6_amd64.deb
+sudo dpkg -i loom_1.3.0_amd64.deb
 sudo apt-get install -f  # Fix any dependency issues
 
 # Run Loom
@@ -659,17 +659,8 @@ live_server = {
 The live-server can be built with or without integration:
 
 ```bash
-# Build WITH live-server integration (default)
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_LIVE_SERVER=ON
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 make -C build -j$(nproc)
-
-# Build WITHOUT live-server integration
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DWITH_LIVE_SERVER=OFF
-make -C build -j$(nproc)
-
-# Use the build script for convenience
-./scripts/build_options.sh with-live-server     # Build with live-server
-./scripts/build_options.sh without-live-server  # Build without live-server
 ```
 
 ### Standalone Usage

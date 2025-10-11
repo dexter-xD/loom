@@ -5,11 +5,11 @@
 
 set -e
 
-VERSION="1.2.6"
+VERSION="1.3.0"
 PACKAGE_NAME="loom"
 PACKAGE_FILE="${PACKAGE_NAME}_${VERSION}_amd64.deb"
 
-echo "🚀 Loom Text Editor v${VERSION} Beta - Complete Package Build"
+echo "🚀 Loom Text Editor v${VERSION} Beta - Complete Package Build with Live-Server"
 echo "============================================================="
 
 # Check if we're in the right directory
@@ -128,6 +128,8 @@ CONTENTS=$(dpkg-deb -c "$PACKAGE_FILE")
 
 REQUIRED_FILES=(
     "./usr/bin/loom"
+    "./usr/bin/live-server"
+    "./usr/bin/live-server-bin"
     "./usr/share/loom/config/"
     "./usr/share/loom/plugins/"
     "./usr/share/applications/loom.desktop"
@@ -177,7 +179,7 @@ else
     exit 1
 fi
 
-if echo "$PACKAGE_INFO" | grep -q "Version: 1.2.6"; then
+if echo "$PACKAGE_INFO" | grep -q "Version: 1.3.0"; then
     echo "    ✅ Package version correct"
 else
     echo "    ❌ Package version incorrect"
@@ -226,7 +228,9 @@ echo ""
 
 echo "📁 Package Structure:"
 echo "├── /usr/bin/"
-echo "│   └── loom                    # Main executable"
+echo "│   ├── loom                    # Main executable"
+echo "│   ├── live-server             # Live-server binary"
+echo "│   └── live-server-bin         # Live-server binary (copy)"
 echo "├── /usr/share/loom/"
 echo "│   ├── config/"
 echo "│   │   └── config.lua          # Default configuration"
@@ -251,6 +255,7 @@ echo "  ✅ Lua scripting for configuration and plugins"
 echo "  ✅ Syntax highlighting for multiple programming languages"
 echo "  ✅ Multi-tab interface with customizable keybindings"
 echo "  ✅ Gruvbox theme for comfortable coding"
+echo "  ✅ 🆕 Integrated live-server with hot reload for web development"
 echo "  ✅ AutoSave plugin with configurable intervals"
 echo "  ✅ AutoFormat plugin supporting:"
 echo "      • C/C++ (clang-format)"
